@@ -33,7 +33,7 @@ public:
     virtual bool isValidUse(Link*, Player*) const = 0;
     virtual bool isValidUse(Link*, Tile*) const = 0;
     virtual bool isValidUse(Link*, Link*) const = 0;
-    virtual AbilityID getID() const = 0;
+    virtual AbilityID getID();
 };
 
 #endif // ABILITY_H 
