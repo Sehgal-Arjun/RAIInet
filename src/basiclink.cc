@@ -38,3 +38,7 @@ void BasicLink::setInUse(bool inUse) {
 void BasicLink::setLocation(std::pair<int, int> loc) {
     this->location = loc;
 }
+
+void BasicLink::setLinkType(LinkType t) {
+    this->linkType = t;
+}

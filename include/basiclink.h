@@ -31,6 +31,7 @@ public:
     bool isKnight() const;
     void setInUse(bool inUse);
     void setLocation(std::pair<int, int> loc);
+    void setLinkType(LinkType t);
 };
 
 #endif // BASICLINK_H

@@ -18,6 +18,7 @@ public:
     virtual bool isKnight() const = 0;
     virtual void setInUse(bool inUse) = 0;
     virtual void setLocation(std::pair<int, int> loc) const = 0;
+    virtual void setLinkType(LinkType t) const = 0;
 };
 
 #endif // LINK_H 
