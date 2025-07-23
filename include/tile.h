@@ -8,11 +8,15 @@ class Tile {
     Link* occupant;
 
     public:
+        Tile() : isBasic{true}, isFirewall{false}, isServerPort{false} {}
+        virtual ~Tile() = default;
+
         bool isBasic();
         bool isFirewall();
         bool isServerPort();
         void enableFirewall();
         void enableServerPort();
+        void setOccupant(Link* l);
 };
 
 #endif
