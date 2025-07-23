@@ -2,22 +2,22 @@
 #define BASICLINK_H
 
 #include <utility>
+#include "link.h"
 
-class Player; // Forward declaration
+class Player;
 
 enum class LinkType {
-    // Placeholder for actual link types
     DATA,
     VIRUS
 };
 
-class BasicLink {
+class BasicLink : public Link {
 private:
     int strength;
     bool isData;
     std::pair<int, int> location;
     bool inUse;
-    Player* owner;
+    Player* owner; // non-owning
     LinkType linkType;
     int travelDistance;
 
@@ -31,7 +31,7 @@ public:
     bool isKnight() const;
     void setInUse(bool inUse);
     void setLocation(std::pair<int, int> loc);
-    void setLinkType(LinkType t);
+    void setLinkType(LinkType t) = 0;
 };
 
 #endif // BASICLINK_H

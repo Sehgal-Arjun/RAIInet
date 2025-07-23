@@ -37,10 +37,10 @@ void BoostedLink::setInUse(bool inUse) {
     next->setInUse(inUse);
 }
 
-void BoostedLink::setLocation(std::pair<int, int> loc) const {
+void BoostedLink::setLocation(std::pair<int, int> loc) {
     next->setLocation(loc);
 }
 
-void BoostedLink::setLinkType(LinkType t) const {
+void BoostedLink::setLinkType(LinkType t) {
     next->setLinkType(t);
 } 

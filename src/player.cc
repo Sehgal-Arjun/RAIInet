@@ -25,18 +25,16 @@ void Player::download(Link* l){
 
 void Player::printAbilities(std::ostream& out) {
     for (const auto& ability : chosenAbilities) {
-        out << ability.getID() << ". " << ability.getName()
-        << " " << (ability.isUsed() ? "(USED)" : "(UNUSED)")
+        out << ability->getID() << ". " << ability->getName()
+        << " " << (ability->isUsed() ? "(USED)" : "(UNUSED)")
             << '\n';
     }
 }
 
-vector<Ability> Player::getAbilities(){ return chosenAbilities; }
-
 void Player::boostLink(Link* l) {
     for (auto& pair : links) {
-        if (pair.second == l) {
-            pair.second = new BoostedLink(l, 1);
+        if (pair.second.get() == l) {
+            pair.second = std::make_unique<BoostedLink>(l, 1);
             break;
         }
     }
@@ -44,10 +42,9 @@ void Player::boostLink(Link* l) {
 
 void Player::reveal(Link* l){
     if (l->getLinkType() == LinkType::DATA){
-        knownOpponentLinks[l->getOwner()]["D" + std::to_string(l->getStrength())] = l;
+        knownOpponentLinks[l->getOwner()]["D" + std::to_string(l->getStrength())] = std::shared_ptr<Link>(l);
     }
     else if (l->getLinkType() == LinkType::VIRUS){
-        knownOpponentLinks[l->getOwner()]["V" + std::to_string(l->getStrength())] = l;
+        knownOpponentLinks[l->getOwner()]["V" + std::to_string(l->getStrength())] = std::shared_ptr<Link>(l);
     }
-
 }
