@@ -17,7 +17,7 @@ class Board : public Subject {
         void reveal(Link* l, Player& p);
 
     private:
-        std::vector<Link> randomiseLinks();
+        std::vector<std::unique_ptr<Link>> randomiseLinks(Player* p);
 };
 
 #endif
