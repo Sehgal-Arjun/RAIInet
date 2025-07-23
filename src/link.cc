@@ -1,2 +1,3 @@
 #include "link.h"
-// No implementation needed for pure virtual class Link 
+
+// no implementation needed, since Link is pure virtual
