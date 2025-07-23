@@ -29,8 +29,8 @@ public:
     Player* getOwner() const;
     bool isInUse() const;
     bool isKnight() const;
-    void setInUse(bool inUse) const;
-    void setLocation(std::pair<int, int> loc) const;
+    void setInUse(bool inUse);
+    void setLocation(std::pair<int, int> loc);
 };
 
 #endif // BASICLINK_H

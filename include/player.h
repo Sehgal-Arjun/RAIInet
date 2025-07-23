@@ -6,6 +6,7 @@
 #include <map>
 #include <string>
 #include "link.h"
+#include "ability.h"
 
 class Player {
     private:

@@ -15,7 +15,6 @@ public:
     Player* getOwner() const override;
     bool isInUse() const override;
     bool isKnight() const override;
-    void setInUse(bool inUse) = 0;
 };
 
 #endif // BOOSTEDLINK_H 
