@@ -1,13 +1,13 @@
-#ifndef WEAKENLY_H
-#define WEAKENLY_H
+#ifndef WEAKENIFY_H
+#define WEAKENIFY_H
 
 #include "ability.h"
 
-class Weakenly : public Ability {
+class Weakenify : public Ability {
 public:
     void applyAbility(Link*) override;
     bool isValidUse(Link*) const override;
     AbilityID getID() const override;
 };
 
-#endif // WEAKENLY_H 
+#endif // WEAKENIFY_H 

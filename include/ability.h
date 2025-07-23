@@ -9,7 +9,7 @@ class Tile;
 
 enum class AbilityID {
     POLARIZE,
-    WEAKENLY,
+    WEAKENIFY,
     LINKBOOST,
     UPLOADIFY,
     SWAPIFY,
