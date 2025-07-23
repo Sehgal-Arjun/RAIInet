@@ -30,3 +30,11 @@ bool BasicLink::isInUse() const {
 bool BasicLink::isKnight() const {
     return false;
 } 
+
+void setInUse(bool inUse) const {
+    this->inUse = inUse;
+}
+
+void setLocation(std::pair<int, int> loc) const {
+    this->location = loc;
+}
