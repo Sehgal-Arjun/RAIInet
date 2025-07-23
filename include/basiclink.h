@@ -2,35 +2,43 @@
 #define BASICLINK_H
 
 #include <utility>
+#include "link.h"
 
-class Player; // Forward declaration
+class Player;
 
 enum class LinkType {
-    // Placeholder for actual link types
     DATA,
     VIRUS
 };
 
-class BasicLink {
+class BasicLink : public Link {
 private:
     int strength;
     bool isData;
     std::pair<int, int> location;
     bool inUse;
-    Player* owner;
+    Player* owner; // non-owning
     LinkType linkType;
     int travelDistance;
 
 public:
-    int getStrength() const;
-    int getTravelDistance() const;
-    LinkType getLinkType() const;
-    std::pair<int, int> getLocation() const;
-    Player* getOwner() const;
-    bool isInUse() const;
-    bool isKnight() const;
-    void setInUse(bool inUse) const;
-    void setLocation(std::pair<int, int> loc) const;
+    BasicLink(int strength, bool isData, int x, int y, Player* owner) : strength{strength}, 
+                                                                        isData{isData}, 
+                                                                        location{std::make_pair(x, y)}, 
+                                                                        inUse{true}, 
+                                                                        owner{owner}, 
+                                                                        linkType{isData ? LinkType::DATA : LinkType::VIRUS}, 
+                                                                        travelDistance{1} {}
+
+    int getStrength() const override;
+    int getTravelDistance() const override;
+    LinkType getLinkType() const override;
+    std::pair<int, int> getLocation() const override;
+    Player* getOwner() const override;
+    bool isInUse() const override;
+    bool isKnight() const override;
+    void setInUse(bool inUse) override;
+    void setLocation(std::pair<int, int> loc) override;
 };
 
 #endif // BASICLINK_H
