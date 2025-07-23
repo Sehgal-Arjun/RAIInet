@@ -7,8 +7,8 @@ class Player; // Forward declaration
 
 enum class LinkType {
     // Placeholder for actual link types
-    TYPE1,
-    TYPE2
+    DATA,
+    VIRUS
 };
 
 class BasicLink {
@@ -29,6 +29,8 @@ public:
     Player* getOwner() const;
     bool isInUse() const;
     bool isKnight() const;
+    void setInUse(bool inUse) const;
+    void setLocation(std::pair<int, int> loc) const;
 };
 
 #endif // BASICLINK_H
