@@ -2,6 +2,7 @@
 #include "../include/link.h"
 #include "../include/basiclink.h"
 #include "../include/ability.h"
+#include "../include/boostedlink.h"
 #include <iostream>
 
 using namespace std;
@@ -31,3 +32,12 @@ void Player::printAbilities(std::ostream& out) {
 }
 
 vector<Ability> Player::getAbilities(){ return chosenAbilities; }
+
+void Player::boostLink(Link* l) {
+    for (auto& pair : links) {
+        if (pair.second == l) {
+            pair.second = new BoostedLink(l, 1);
+            break;
+        }
+    }
+}

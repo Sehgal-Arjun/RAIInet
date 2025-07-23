@@ -5,9 +5,8 @@
 
 class LinkBoost : public Ability {
 public:
-    void applyAbility(Link*) override;
-    bool isValidUse(Link*) const override;
-    AbilityID getID() const override;
+    void applyAbility(Link& l) override;
+    bool isValidUse(Link* l, Player* p) const override;
 };
 
 #endif // LINKBOOST_H 

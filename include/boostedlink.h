@@ -15,6 +15,9 @@ public:
     Player* getOwner() const override;
     bool isInUse() const override;
     bool isKnight() const override;
+    void setInUse(bool inUse) override;
+    void setLocation(std::pair<int, int> loc) const override;
+    void setLinkType(LinkType t) const override;
 };
 
 #endif // BOOSTEDLINK_H 

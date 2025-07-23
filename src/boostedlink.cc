@@ -1,4 +1,4 @@
-#include "boostedlink.h"
+#include "../include/boostedlink.h"
 
 using namespace std;
 
@@ -31,4 +31,16 @@ bool BoostedLink::isInUse() const {
 
 bool BoostedLink::isKnight() const {
     return next->isKnight();
+}
+
+void BoostedLink::setInUse(bool inUse) {
+    next->setInUse(inUse);
+}
+
+void BoostedLink::setLocation(std::pair<int, int> loc) const {
+    next->setLocation(loc);
+}
+
+void BoostedLink::setLinkType(LinkType t) const {
+    next->setLinkType(t);
 } 
