@@ -24,6 +24,7 @@ class Player {
         void printAbilities(std::ostream& out);
         std::vector<Ability> getAbilities();
         void boostLink(Link* l);
+        void reveal(Link* l);
 };
 
 #endif // PLAYER_H

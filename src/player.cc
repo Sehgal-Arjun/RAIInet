@@ -41,3 +41,13 @@ void Player::boostLink(Link* l) {
         }
     }
 }
+
+void Player::reveal(Link* l){
+    if (l->getLinkType() == LinkType::DATA){
+        knownOpponentLinks[l->getOwner()]["D" + std::to_string(l->getStrength())] = l;
+    }
+    else if (l->getLinkType() == LinkType::VIRUS){
+        knownOpponentLinks[l->getOwner()]["V" + std::to_string(l->getStrength())] = l;
+    }
+
+}
