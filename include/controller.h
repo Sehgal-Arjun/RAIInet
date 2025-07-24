@@ -29,6 +29,9 @@ class Controller {
         bool isMoveIntoOpponentFirewall(Tile* t);
         void useAbility(Ability& a, Player& p, Link& l);
         void useAbility(Ability& a, Player& p, Tile& t);
+        void useAbility(Ability& a, Link& l);
+        void useAbility(Ability& a, Link& l1, Link& l2);
+        void useAbility(Ability& a, Player& p, Link& l, Tile& t);
         bool checkGameWon();
         void switchTurn();
 };

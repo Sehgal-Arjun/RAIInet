@@ -1,6 +1,4 @@
 #include "../include/firewall.h"
-#include "../include/link.h"
-#include "../include/player.h"
 #include "../include/tile.h"
 
 void Firewall::applyAbility(Tile& t) {
