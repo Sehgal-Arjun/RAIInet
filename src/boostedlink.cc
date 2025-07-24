@@ -36,3 +36,11 @@ void BoostedLink::setInUse(bool inUse) {
 void BoostedLink::setLinkType(LinkType t) {
     next->setLinkType(t);
 } 
+
+Tile* BoostedLink::getTile() const {
+    return next->getTile();
+}
+
+void BoostedLink::setTile(Tile* t){
+    next->setTile(t);
+}

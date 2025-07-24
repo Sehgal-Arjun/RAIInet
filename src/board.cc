@@ -12,7 +12,7 @@
 
 using namespace std;
 
-void Board::initialiseBoard(std::istream& in) {
+void Board::initialiseBoard(std::istream& in, vector<Player*> players) {
     height = 8;
     width = 8;
     grid.clear();
@@ -30,9 +30,13 @@ void Board::initialiseBoard(std::istream& in) {
     }
 
     grid.at(0).at(width / 2)->enableServerPort();
+    grid.at(0).at(width / 2)->setServerPortOwner(players.at(0));
     grid.at(0).at(width / 2 - 1)->enableServerPort();
+    grid.at(0).at(width / 2 - 1)->setServerPortOwner(players.at(0));
     grid.at(height - 1).at(width / 2)->enableServerPort();
+    grid.at(height - 1).at(width / 2)->setServerPortOwner(players.at(1));
     grid.at(height - 1).at(width / 2 - 1)->enableServerPort();    
+    grid.at(height - 1).at(width / 2 - 1)->setServerPortOwner(players.at(1));
 }
 
 void Board::placeLink(Link& l, Tile* t) {
@@ -79,4 +83,12 @@ std::vector<std::unique_ptr<Link>> Board::randomiseLinks(Player* p) {
         randomisedOrder[linkNums[i]] = std::make_unique<BasicLink>(strength, isData, i, y, p);
     }
     return randomisedOrder;
+}
+
+Tile* Board::getTileAt(int row, int col) const {
+    if (row < 0 || row >= height || col < 0 || col >= width) {
+        return nullptr;
+    }
+
+    return grid[row][col].get();
 }

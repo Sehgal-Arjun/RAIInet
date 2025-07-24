@@ -10,7 +10,7 @@ void Uploadify::applyAbility(Link& l, Player& p, Tile& location) {
     p.upload(&l, &location);
 }
 
-bool Uploadify::isValidUse(Link* l, Player* p, Tile& location) const {
+bool Uploadify::isValidUse(Link* l, Player* p, Tile* location) const {
     // location that is being uploaded to is empty, can only upload your own link, and cannot upload to a server tile!
-    return (l->getOwner() == p && location.getOccupant() == nullptr && !location.isServerPortTile());
+    return (l->getOwner() == p && location->getOccupant() == nullptr && !location->isServerPortTile());
 }

@@ -12,9 +12,12 @@ class Board : public Subject {
     std::vector<std::vector<std::unique_ptr<Tile>>> grid;
 
     public:
-        void initialiseBoard(std::istream& in);
+        void initialiseBoard(std::istream& in, std::vector<Player*> players);
         void placeLink(Link& l, Tile* t);
         void reveal(Link* l, Player& p);
+        Tile* getTileAt(int row, int col) const;
+        int getHeight() {return height;}
+        int getWidth() {return width;}
 
     private:
         std::vector<std::unique_ptr<Link>> randomiseLinks(Player* p);

@@ -33,3 +33,19 @@ pair<int, int> Tile::getLocation() const {
 void Tile::setLocation(pair<int, int> loc){
     location = loc;
 }
+
+Player* Tile::getFirewallOwner() const {
+    return firewallOwner;
+}
+
+void Tile::setFirewallOwner(Player* p) {
+    firewallOwner = p;
+}
+
+Player* Tile::getServerPortOwner() const {
+    return firewallOwner;
+}
+
+void Tile::setServerPortOwner(Player* p) {
+    firewallOwner = p;
+}

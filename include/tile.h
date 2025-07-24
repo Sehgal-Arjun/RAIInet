@@ -7,6 +7,8 @@ class Tile {
     bool isBasic, isFirewall, isServerPort;
     Link* occupant;
     std::pair<int, int> location;
+    Player* firewallOwner;
+    Player* serverPortOwner;
 
     public:
         Tile() : isBasic{true}, isFirewall{false}, isServerPort{false} {}
@@ -21,6 +23,10 @@ class Tile {
         Link* getOccupant() const;
         std::pair<int, int> getLocation() const;
         void setLocation(std::pair<int, int> location);
+        Player* getFirewallOwner() const;
+        void setFirewallOwner(Player* p);
+        Player* getServerPortOwner() const;
+        void setServerPortOwner(Player* p);
 };
 
 #endif

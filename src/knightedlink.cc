@@ -27,3 +27,19 @@ bool KnightedLink::isInUse() const {
 bool KnightedLink::isKnight() const {
     return true;
 } 
+
+void KnightedLink::setInUse(bool inUse) {
+    next->setInUse(inUse);
+}
+
+void KnightedLink::setLinkType(LinkType t) {
+    next->setLinkType(t);
+} 
+
+Tile* KnightedLink::getTile() const {
+    return next->getTile();
+}
+
+void KnightedLink::setTile(Tile* t){
+    next->setTile(t);
+}

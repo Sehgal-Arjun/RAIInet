@@ -81,10 +81,12 @@ void Player::knightLink(Link* l) {
 }
 
 void Player::reveal(Link* l){
-    if (l->getLinkType() == LinkType::DATA){
-        knownOpponentLinks[l->getOwner()]["D" + std::to_string(l->getStrength())] = std::shared_ptr<Link>(l);
-    }
-    else if (l->getLinkType() == LinkType::VIRUS){
-        knownOpponentLinks[l->getOwner()]["V" + std::to_string(l->getStrength())] = std::shared_ptr<Link>(l);
+    if (l->getOwner() != this){ // make sure we're not adding to the map if it's your own link
+        if (l->getLinkType() == LinkType::DATA){
+            knownOpponentLinks[l->getOwner()]["D" + std::to_string(l->getStrength())] = std::shared_ptr<Link>(l);
+        }
+        else if (l->getLinkType() == LinkType::VIRUS){
+            knownOpponentLinks[l->getOwner()]["V" + std::to_string(l->getStrength())] = std::shared_ptr<Link>(l);
+        }
     }
 }

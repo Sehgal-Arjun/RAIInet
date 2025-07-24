@@ -16,6 +16,7 @@ class Player {
         int dataAmountDownloaded = 0;
         int virusAmountDownloaded = 0;
         bool hasWon = false;
+        bool hasLost = false;
         int playerId;
 
     public:
@@ -35,6 +36,15 @@ class Player {
         std::map<std::string, std::unique_ptr<Link>>& getLinks() { return links; }
         const std::map<Player*, std::map<std::string, std::shared_ptr<Link>>>& getKnownOpponentLinks() const { return knownOpponentLinks; }
         std::map<Player*, std::map<std::string, std::shared_ptr<Link>>>& getKnownOpponentLinks() { return knownOpponentLinks; }
+        int getDataAmountDownloaded() { return dataAmountDownloaded; }
+        int getVirusAmountDownloaded() { return virusAmountDownloaded; }
+        bool getHasWon() { return hasWon; }
+        bool getHasLost() { return hasLost; }
+        void setHasWon() { hasWon = true; }
+        void setHasLost() { hasLost = true; }
+
+
+
 };
 
 #endif // PLAYER_H

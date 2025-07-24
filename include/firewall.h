@@ -6,7 +6,7 @@
 
 class Firewall: public Ability {
 public:
-    void applyAbility(Tile& t) override;
+    void applyAbility(Tile& t, Player* p) override;
     
     bool isValidUse(Tile* t) const override;
 };
