@@ -41,3 +41,11 @@ Player* Tile::getFirewallOwner() const {
 void Tile::setFirewallOwner(Player* p) {
     firewallOwner = p;
 }
+
+Player* Tile::getServerPortOwner() const {
+    return firewallOwner;
+}
+
+void Tile::setServerPortOwner(Player* p) {
+    firewallOwner = p;
+}

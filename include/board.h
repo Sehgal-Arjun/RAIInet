@@ -12,7 +12,7 @@ class Board : public Subject {
     std::vector<std::vector<std::unique_ptr<Tile>>> grid;
 
     public:
-        void initialiseBoard(std::istream& in);
+        void initialiseBoard(std::istream& in, std::vector<Player*> players);
         void placeLink(Link& l, Tile* t);
         void reveal(Link* l, Player& p);
 

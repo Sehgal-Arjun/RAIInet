@@ -10,7 +10,9 @@
 #include <map>
 #include <string>
 
-void Board::initialiseBoard(std::istream& in) {
+using namespace std;
+
+void Board::initialiseBoard(std::istream& in, vector<Player*> players) {
     height = 8;
     width = 8;
     grid.clear();
@@ -26,9 +28,13 @@ void Board::initialiseBoard(std::istream& in) {
     }
 
     grid.at(0).at(width / 2)->enableServerPort();
+    grid.at(0).at(width / 2)->setServerPortOwner(players.at(0));
     grid.at(0).at(width / 2 - 1)->enableServerPort();
+    grid.at(0).at(width / 2 - 1)->setServerPortOwner(players.at(0));
     grid.at(height - 1).at(width / 2)->enableServerPort();
+    grid.at(height - 1).at(width / 2)->setServerPortOwner(players.at(1));
     grid.at(height - 1).at(width / 2 - 1)->enableServerPort();    
+    grid.at(height - 1).at(width / 2 - 1)->setServerPortOwner(players.at(1));
 }
 
 void Board::placeLink(Link& l, Tile* t) {    
