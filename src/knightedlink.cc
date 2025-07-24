@@ -1,4 +1,4 @@
-#include "knightedlink.h"
+#include "../include/knightedlink.h"
 
 using namespace std;
 

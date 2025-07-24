@@ -5,9 +5,8 @@
 
 class Uploadify : public Ability {
 public:
-    void applyAbility(Link*) override;
+    void applyAbility(Link&) override;
     bool isValidUse(Link*) const override;
-    AbilityID getID() const override;
 };
 
 #endif // UPLOADIFY_H 

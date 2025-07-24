@@ -5,9 +5,8 @@
 
 class Weakenify : public Ability {
 public:
-    void applyAbility(Link*) override;
+    void applyAbility(Link&) override;
     bool isValidUse(Link*) const override;
-    AbilityID getID() const override;
 };
 
 #endif // WEAKENIFY_H 

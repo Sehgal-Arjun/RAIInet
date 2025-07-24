@@ -1,4 +1,4 @@
-#include "weakenedlink.h"
+#include "../include/weakenedlink.h"
 
 using namespace std;
 
