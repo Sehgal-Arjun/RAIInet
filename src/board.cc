@@ -39,9 +39,8 @@ void Board::initialiseBoard(std::istream& in, vector<Player*> players) {
     grid.at(height - 1).at(width / 2 - 1)->setServerPortOwner(players.at(1));
 }
 
-void Board::placeLink(Link& l, Tile* t) {
+void Board::placeLink(Link& l, Tile* t) {    
     t->setOccupant(&l);
-    l.setTile(t);
     notifyObservers();
 }
 
