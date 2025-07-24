@@ -16,10 +16,6 @@ LinkType KnightedLink::getLinkType() const {
     return next->getLinkType();
 }
 
-pair<int, int> KnightedLink::getLocation() const {
-    return next->getLocation();
-}
-
 Player* KnightedLink::getOwner() const {
     return next->getOwner();
 }

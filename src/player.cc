@@ -13,8 +13,9 @@ void Player::download(Link* l){
     // 1. mark link as not in use
     l->setInUse(false);
     
-    // 2. move link to (-1, -1)
-    l->setLocation(make_pair(-1, -1));
+    // 2. indicate that the Link isn't on a Tile
+    l->getTile()->setOccupant(nullptr);
+    l->setTile(nullptr);
 
     // 3. increment data/virusAmountDownloaded
     if (l->getLinkType() == LinkType::DATA) {
@@ -25,12 +26,12 @@ void Player::download(Link* l){
     }
 }
 
-void Player::upload(Link* l, pair<int, int> location){
+void Player::upload(Link* l, Tile* tile){
     // 1. mark link as in use
     l->setInUse(true);
     
-    // 2. move link to (-1, -1)
-    l->setLocation(location);
+    // 2. put the link on the appropriate tile
+    l->setTile(tile);
 
     // 3. decrement data/virusAmountDownloaded
     if (l->getLinkType() == LinkType::DATA) {
@@ -39,6 +40,9 @@ void Player::upload(Link* l, pair<int, int> location){
     else if (l->getLinkType() == LinkType::VIRUS){
         this->virusAmountDownloaded--;
     }
+
+    //4. make sure the tile knows it has an occupant
+    tile->setOccupant(l);
 }
 
 void Player::printAbilities(std::ostream& out) {

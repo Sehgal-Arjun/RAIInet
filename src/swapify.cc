@@ -7,13 +7,10 @@ using namespace std;
 
 void Swapify::applyAbility(Link& l1, Link& l2) {
     // we are sure that l is not owned by p, so we can download it safely
-    pair<int, int> tempLoc = l1.getLocation();
     Tile* tempTile = l1.getTile();
-
-    l1.setLocation(l2.getLocation());
+    l2.getTile()->setOccupant(&l1);
     l1.setTile(l2.getTile());
-
-    l2.setLocation(tempLoc);
+    l1.getTile()->setOccupant(&l2);
     l2.setTile(tempTile);
 }
 
