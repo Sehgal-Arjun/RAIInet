@@ -12,6 +12,8 @@
 
 using namespace std;
 
+using namespace std;
+
 void Board::initialiseBoard(std::istream& in, vector<Player*> players) {
     height = 8;
     width = 8;
