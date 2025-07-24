@@ -4,7 +4,7 @@
 
 void LinkBoost::applyAbility(Link& l) {
     // need to have the owner of l replace it with a BoostedLink!
-    l.getOwner()->boostLink(&l);
+    l.getOwner()->boostLink(&l, 1);
 }
 
 bool LinkBoost::isValidUse(Link* l, Player* p) const {

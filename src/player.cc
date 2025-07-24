@@ -3,6 +3,7 @@
 #include "../include/basiclink.h"
 #include "../include/ability.h"
 #include "../include/boostedlink.h"
+#include "../include/weakenedlink.h"
 #include <iostream>
 
 using namespace std;
@@ -31,10 +32,19 @@ void Player::printAbilities(std::ostream& out) {
     }
 }
 
-void Player::boostLink(Link* l) {
+void Player::boostLink(Link* l, int boostAmount) {
     for (auto& pair : links) {
         if (pair.second.get() == l) {
-            pair.second = std::make_unique<BoostedLink>(l, 1);
+            pair.second = std::make_unique<BoostedLink>(l, boostAmount);
+            break;
+        }
+    }
+}
+
+void Player::weakenLink(Link* l, int debuffAmount) {
+    for (auto& pair : links) {
+        if (pair.second.get() == l) {
+            pair.second = std::make_unique<WeakenedLink>(l, debuffAmount);
             break;
         }
     }
