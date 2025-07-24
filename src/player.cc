@@ -4,6 +4,7 @@
 #include "../include/ability.h"
 #include "../include/boostedlink.h"
 #include "../include/weakenedlink.h"
+#include "../include/knightedLink.h"
 #include <iostream>
 
 using namespace std;
@@ -45,6 +46,15 @@ void Player::weakenLink(Link* l, int debuffAmount) {
     for (auto& pair : links) {
         if (pair.second.get() == l) {
             pair.second = std::make_unique<WeakenedLink>(l, debuffAmount);
+            break;
+        }
+    }
+}
+
+void Player::knightLink(Link* l) {
+    for (auto& pair : links) {
+        if (pair.second.get() == l) {
+            pair.second = std::make_unique<KnightedLink>(l);
             break;
         }
     }
