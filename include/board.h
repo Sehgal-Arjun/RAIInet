@@ -15,6 +15,9 @@ class Board : public Subject {
         void initialiseBoard(std::istream& in, std::vector<Player*> players);
         void placeLink(Link& l, Tile* t);
         void reveal(Link* l, Player& p);
+        Tile* getTileAt(int row, int col) const;
+        int getHeight() {return height;}
+        int getWidth() {return width;}
 
     private:
         std::vector<std::unique_ptr<Link>> randomiseLinks(Player* p);

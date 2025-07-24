@@ -17,10 +17,6 @@ LinkType BoostedLink::getLinkType() const {
     return next->getLinkType();
 }
 
-pair<int, int> BoostedLink::getLocation() const {
-    return next->getLocation();
-}
-
 Player* BoostedLink::getOwner() const {
     return next->getOwner();
 }
@@ -35,10 +31,6 @@ bool BoostedLink::isKnight() const {
 
 void BoostedLink::setInUse(bool inUse) {
     next->setInUse(inUse);
-}
-
-void BoostedLink::setLocation(std::pair<int, int> loc) {
-    next->setLocation(loc);
 }
 
 void BoostedLink::setLinkType(LinkType t) {

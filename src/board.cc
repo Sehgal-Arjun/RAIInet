@@ -21,7 +21,9 @@ void Board::initialiseBoard(std::istream& in, vector<Player*> players) {
         std::vector<std::unique_ptr<Tile>> row;
 
         for (int c = 0; c < width; ++c) {
-            row.push_back(std::make_unique<Tile>());
+            unique_ptr<Tile> tile = make_unique<Tile>();
+            row.push_back(tile);
+            tile->setLocation(make_pair(r, c));
         }
 
         grid.push_back(std::move(row));
@@ -37,8 +39,9 @@ void Board::initialiseBoard(std::istream& in, vector<Player*> players) {
     grid.at(height - 1).at(width / 2 - 1)->setServerPortOwner(players.at(1));
 }
 
-void Board::placeLink(Link& l, Tile* t) {    
+void Board::placeLink(Link& l, Tile* t) {
     t->setOccupant(&l);
+    l.setTile(t);
     notifyObservers();
 }
 
