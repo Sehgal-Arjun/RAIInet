@@ -8,23 +8,82 @@ void Controller::makeMove(Link& l, const std::string& direction, Player& p) {
 
 }
 
-void makeMove(Link& l, const std::string& direction, Player& p, std::string first, std::string second) {
+void Controller::makeMove(Link& l, const std::string& directionFirst, const std::string& directionSecond, Player& p) {
 
 }
 
-bool isValidMove(Link* l, Tile* t, Player* p) {
+bool Controller::isValidMove(Link* l, const std::string& direction) {
+    if (l->getOwner() != currentTurn) {
+        return false;
+    }
+
+    int row = l->getTile()->getLocation().first;
+    int col = l->getTile()->getLocation().second;
+
+    int height = board->getHeight();
+    int width = board->getWidth();
+
+    if (direction == "up") {
+        row -= l->getTravelDistance();
+    }
+    else if (direction == "down") {
+        row += l->getTravelDistance();
+    }
+    else if (direction == "left") {
+        col -= l->getTravelDistance();
+    }
+    else if (direction == "right") {
+        col += l->getTravelDistance();
+    }
+    else {
+        return false;
+    }
+
+    if (col < 0 || col >= width) {
+        return false;
+    }
+
+    if (currentTurn->getPlayerId() == 1) {
+        if (row < 0) {
+            return false;
+        }
+    }
+    else if (currentTurn->getPlayerId() == 2) {
+        if (row >= height) {
+            return false;
+        }
+    }
+
+    Tile* destination = board->getTileAt(row, col);
+    if (!destination) {
+        return false;
+    }
+
+    Link* occupant = destination->getOccupant();
+    if (occupant && occupant->getOwner() == currentTurn) {
+        return false;
+    }
+
+    if (destination->isServerPortTile() && destination->getServerPortOwner() == currentTurn) {
+        return false;
+    }
+
+    return true;
+}
+
+bool Controller::isValidMove(Link& l, const std::string& directionFirst, const std::string& directionSecond) {
 
 }
 
-void battle(Link& l1, Link& l2, Tile& t) {
+void Controller::battle(Link& l1, Link& l2, Tile& t) {
 
 }
 
-bool isMoveIntoOpponentServerPort(Tile* t) {
+bool Controller::isMoveIntoOpponentServerPort(Tile* t) {
 
 }
 
-bool isMoveIntoOpponentFirewall(Tile* t) {
+bool Controller::isMoveIntoOpponentFirewall(Tile* t) {
 
 }
 
@@ -110,6 +169,21 @@ bool Controller::checkGameWon() {
     return false;
 }
 
-void switchTurn() {
-
+void Controller::switchTurn() {
+    if (players.at(players.size() - 1) == currentTurn) {
+        currentTurn = players.at(0);
+    }
+    else {
+        bool cur = false;
+        for (auto& p : players) {
+            if (currentTurn == p) {
+                cur = true;
+                continue;
+            }
+            
+            if (cur) {
+                currentTurn = p;
+            }
+        }
+    }
 }
