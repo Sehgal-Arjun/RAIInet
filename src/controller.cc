@@ -1,11 +1,67 @@
 #include "../include/controller.h"
+#include "../include/basiclink.h"
 
 #include <iostream>
 
 using namespace std;
 
 void Controller::makeMove(Link& l, const std::string& direction, Player& p) {
+    if (!isValidMove(&l, direction)) {
+        return;
+        cout << "INVALID MOVE" << endl;
+    }
 
+    int row = l.getTile()->getLocation().first;
+    int col = l.getTile()->getLocation().second;
+
+    if (direction == "up") {
+        row -= l.getTravelDistance();
+    }
+    else if (direction == "down") {
+        row += l.getTravelDistance();
+    }
+    else if (direction == "left") {
+        col -= l.getTravelDistance();
+    }
+    else if (direction == "right") {
+        col += l.getTravelDistance();
+    }
+
+    Tile* destination = board->getTileAt(row, col);
+
+    if (destination->isFirewallTile() && destination->getFirewallOwner() != &p) {
+        for (auto& p : this->players) {
+            p->reveal(&l);
+        }
+
+        if (l.getLinkType() == LinkType::VIRUS) {
+            l.getOwner()->download(&l);
+            return;
+        }
+    }
+    
+    if (destination->getOccupant() != nullptr && destination->getOccupant()->getOwner() != &p) {
+        Link& winner = battle(l, *destination->getOccupant(), *destination, *l.getTile());
+        Player& owner = *winner.getOwner();
+
+        if (&winner == &l) {
+            owner.download(destination->getOccupant());
+        }
+        else {
+            destination->getOccupant()->getOwner()->download(&l);
+            return;
+        }
+    }
+    else if (destination->isServerPortTile()) {
+        destination->getServerPortOwner()->download(&l);
+        return;
+    }
+
+    l.getTile()->setOccupant(nullptr);
+    l.setTile(destination);
+    destination->setOccupant(&l);
+
+    switchTurn();
 }
 
 void Controller::makeMove(Link& l, const std::string& directionFirst, const std::string& directionSecond, Player& p) {
@@ -75,7 +131,7 @@ bool Controller::isValidMove(Link& l, const std::string& directionFirst, const s
 
 }
 
-void Controller::battle(Link& l1, Link& l2, Tile& t) {
+Link& Controller::battle(Link& initiator, Link& victim, Tile& battleTile, Tile& initiatorTile) {
 
 }
 

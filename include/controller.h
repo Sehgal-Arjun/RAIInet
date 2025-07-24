@@ -26,7 +26,7 @@ class Controller {
         bool isValidMove(Link* l, const std::string& direction);
         bool isValidMove(Link& l, const std::string& directionFirst, const std::string& directionSecond);
 
-        void battle(Link& l1, Link& l2, Tile& t);
+        Link& battle(Link& l1, Link& l2, Tile& battleTile, Tile& initiatorTile);
         bool isMoveIntoOpponentServerPort(Tile* t);
         bool isMoveIntoOpponentFirewall(Tile* t);
         void useAbility(Ability& a, Player& p, Link& l);
