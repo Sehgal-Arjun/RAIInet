@@ -10,6 +10,8 @@
 #include <map>
 #include <string>
 
+using namespace std;
+
 void Board::initialiseBoard(std::istream& in) {
     height = 8;
     width = 8;
@@ -19,7 +21,9 @@ void Board::initialiseBoard(std::istream& in) {
         std::vector<std::unique_ptr<Tile>> row;
 
         for (int c = 0; c < width; ++c) {
-            row.push_back(std::make_unique<Tile>());
+            unique_ptr<Tile> tile = make_unique<Tile>();
+            row.push_back(tile);
+            tile->setLocation(make_pair(r, c));
         }
 
         grid.push_back(std::move(row));
@@ -31,8 +35,9 @@ void Board::initialiseBoard(std::istream& in) {
     grid.at(height - 1).at(width / 2 - 1)->enableServerPort();    
 }
 
-void Board::placeLink(Link& l, Tile* t) {    
+void Board::placeLink(Link& l, Tile* t) {
     t->setOccupant(&l);
+    l.setTile(t);
     notifyObservers();
 }
 

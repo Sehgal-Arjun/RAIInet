@@ -15,10 +15,6 @@ LinkType BasicLink::getLinkType() const {
     return linkType;
 }
 
-pair<int, int> BasicLink::getLocation() const {
-    return location;
-}
-
 Player* BasicLink::getOwner() const {
     return owner;
 }
@@ -33,10 +29,6 @@ bool BasicLink::isKnight() const {
 
 void BasicLink::setInUse(bool inUse) {
     this->inUse = inUse;
-}
-
-void BasicLink::setLocation(std::pair<int, int> loc) {
-    this->location = loc;
 }
 
 void BasicLink::setLinkType(LinkType t) {

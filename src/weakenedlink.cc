@@ -17,10 +17,6 @@ LinkType WeakenedLink::getLinkType() const {
     return next->getLinkType();
 }
 
-pair<int, int> WeakenedLink::getLocation() const {
-    return next->getLocation();
-}
-
 Player* WeakenedLink::getOwner() const {
     return next->getOwner();
 }
