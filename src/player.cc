@@ -25,6 +25,22 @@ void Player::download(Link* l){
     }
 }
 
+void Player::upload(Link* l, pair<int, int> location){
+    // 1. mark link as in use
+    l->setInUse(true);
+    
+    // 2. move link to (-1, -1)
+    l->setLocation(location);
+
+    // 3. decrement data/virusAmountDownloaded
+    if (l->getLinkType() == LinkType::DATA) {
+        this->dataAmountDownloaded--;
+    }
+    else if (l->getLinkType() == LinkType::VIRUS){
+        this->virusAmountDownloaded--;
+    }
+}
+
 void Player::printAbilities(std::ostream& out) {
     for (const auto& ability : chosenAbilities) {
         out << ability->getID() << ". " << ability->getName()

@@ -21,6 +21,7 @@ class Player {
     public:
         ~Player() = default;
         void download(Link* l);
+        void upload(Link* l, std::pair<int, int> location);
         void printAbilities(std::ostream& out);
         std::vector<Ability> getAbilities();
         void boostLink(Link* l, int boostAmount);

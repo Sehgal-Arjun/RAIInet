@@ -25,3 +25,11 @@ void Tile::setOccupant(Link* l){
 Link* Tile::getOccupant() const {
     return occupant;
 }
+
+pair<int, int> Tile::getLocation() const {
+    return location;
+}
+
+void Tile::setLocation(pair<int, int> loc){
+    location = loc;
+}

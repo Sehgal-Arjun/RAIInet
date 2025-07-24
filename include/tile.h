@@ -6,6 +6,7 @@
 class Tile {
     bool isBasic, isFirewall, isServerPort;
     Link* occupant;
+    std::pair<int, int> location;
 
     public:
         Tile() : isBasic{true}, isFirewall{false}, isServerPort{false} {}
@@ -18,6 +19,8 @@ class Tile {
         void enableServerPort();
         void setOccupant(Link* l);
         Link* getOccupant() const;
+        std::pair<int, int> getLocation() const;
+        void setLocation(std::pair<int, int> location);
 };
 
 #endif

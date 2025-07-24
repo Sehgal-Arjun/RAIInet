@@ -19,10 +19,12 @@ public:
     virtual void applyAbility(Tile& t, Player& p) = 0;
     virtual void applyAbility(Link& t, Player& p) = 0;
     virtual void applyAbility(Link& l1, Link& l2) = 0;
+    virtual void applyAbility(Link& l, Player& p, Tile& location);
     virtual bool isValidUse(Link* l) const = 0;
     virtual bool isValidUse(Link* l, Player* p) const = 0;
     virtual bool isValidUse(Link* l1, Link* l2) const = 0;
     virtual bool isValidUse(Tile* t) const = 0;
+    virtual bool isValidUse(Link* l, Player* p, Tile& location) const;
     int getID() const;
     bool isUsed() const;
     std::string getName() const;
