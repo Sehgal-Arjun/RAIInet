@@ -5,27 +5,72 @@
 
 using namespace std;
 
+std::pair<int, int> Controller::calculateMove(Link* l, std::string direction){
+    int row = l->getTile()->getLocation().first;
+    int col = l->getTile()->getLocation().second;
+
+    if (direction == "up") {
+        return make_pair(row - l->getTravelDistance(), col);
+    }
+    else if (direction == "down") {
+        return make_pair(row + l->getTravelDistance(), col);
+    }
+    else if (direction == "left") {
+        return make_pair(row, col - l->getTravelDistance());
+    }
+    else { // direction == "right"
+        return make_pair(row, col + l->getTravelDistance());
+    }
+}
+
+std::pair<int, int> Controller::calculateMove(Link* l, std::string direction1, std::string direction2){
+    int row = l->getTile()->getLocation().first;
+    int col = l->getTile()->getLocation().second;
+
+    if (direction1 == "up") {
+        if (direction2 == "left"){
+            return make_pair(row - l->getTravelDistance() * 2, col - l->getTravelDistance());
+        }
+        else{ // direction2 == "right"
+            return make_pair(row - l->getTravelDistance() * 2, col + l->getTravelDistance());
+        }
+    }
+    else if (direction1 == "down") {
+        if (direction2 == "left"){
+            return make_pair(row + l->getTravelDistance() * 2, col - l->getTravelDistance());
+        }
+        else{ // direction2 == "right"
+            return make_pair(row + l->getTravelDistance() * 2, col + l->getTravelDistance());
+        }
+    }
+    else if (direction1 == "left") {
+        if (direction2 == "up"){
+            return make_pair(row - l->getTravelDistance(), col - l->getTravelDistance() * 2);
+        }
+        else{ // direction2 == "down"
+            return make_pair(row + l->getTravelDistance() * 2, col - l->getTravelDistance() * 2);
+        }
+    }
+    else { // direction1 == "right"
+        if (direction2 == "up"){
+            return make_pair(row - l->getTravelDistance(), col + l->getTravelDistance() * 2);
+        }
+        else{ // direction2 == "down"
+            return make_pair(row + l->getTravelDistance() * 2, col + l->getTravelDistance() * 2);
+        }
+    }
+}
+
+
 void Controller::makeMove(Link& l, const std::string& direction, Player& p) {
     if (!isValidMove(&l, direction)) {
         return;
         cout << "INVALID MOVE" << endl;
     }
 
-    int row = l.getTile()->getLocation().first;
-    int col = l.getTile()->getLocation().second;
-
-    if (direction == "up") {
-        row -= l.getTravelDistance();
-    }
-    else if (direction == "down") {
-        row += l.getTravelDistance();
-    }
-    else if (direction == "left") {
-        col -= l.getTravelDistance();
-    }
-    else if (direction == "right") {
-        col += l.getTravelDistance();
-    }
+    pair<int, int> location = calculateMove(&l, direction);
+    int row = location.first;
+    int col = location.second;
 
     Tile* destination = board->getTileAt(row, col);
 
@@ -71,31 +116,18 @@ void Controller::makeMove(Link& l, const std::string& directionFirst, const std:
 }
 
 bool Controller::isValidMove(Link* l, const std::string& direction) {
+    if (direction != "up" && direction != "down" && direction != "left" && direction != "right") { return false; }
+    
     if (l->getOwner() != currentTurn) {
         return false;
     }
 
-    int row = l->getTile()->getLocation().first;
-    int col = l->getTile()->getLocation().second;
-
     int height = board->getHeight();
     int width = board->getWidth();
 
-    if (direction == "up") {
-        row -= l->getTravelDistance();
-    }
-    else if (direction == "down") {
-        row += l->getTravelDistance();
-    }
-    else if (direction == "left") {
-        col -= l->getTravelDistance();
-    }
-    else if (direction == "right") {
-        col += l->getTravelDistance();
-    }
-    else {
-        return false;
-    }
+    pair<int, int> location = calculateMove(l, direction);
+    int row = location.first;
+    int col = location.second;
 
     if (col < 0 || col >= width) {
         return false;

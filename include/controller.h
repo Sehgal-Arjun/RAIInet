@@ -14,6 +14,8 @@ class Controller {
     std::vector<Player*> players;
     bool useGraphics;
     Player* currentTurn;
+    std::pair<int, int> calculateMove(Link* l, std::string direction);
+    std::pair<int, int> calculateMove(Link* l, std::string direction1, std::string direction2);
 
     public:
         Controller() : board(std::make_unique<Board>()) {}
