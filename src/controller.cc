@@ -80,7 +80,7 @@ void Controller::battle(Link& l1, Link& l2, Tile& t) {
 }
 
 bool Controller::isMoveIntoOpponentServerPort(Tile* t) {
-
+    return (t->isServerPortTile() && t->getServerPortOwner() != currentTurn);
 }
 
 bool Controller::isMoveIntoOpponentFirewall(Tile* t) {
