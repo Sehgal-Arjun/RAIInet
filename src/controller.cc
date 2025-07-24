@@ -61,14 +61,7 @@ std::pair<int, int> Controller::calculateMove(Link* l, std::string direction1, s
     }
 }
 
-
-void Controller::makeMove(Link& l, const std::string& direction, Player& p) {
-    if (!isValidMove(&l, direction)) {
-        return;
-        cout << "INVALID MOVE" << endl;
-    }
-
-    pair<int, int> location = calculateMove(&l, direction);
+void Controller::move(pair<int, int> location, Link& l, Player& p) {
     int row = location.first;
     int col = location.second;
 
@@ -111,23 +104,12 @@ void Controller::makeMove(Link& l, const std::string& direction, Player& p) {
     switchTurn();
 }
 
-void Controller::makeMove(Link& l, const std::string& directionFirst, const std::string& directionSecond, Player& p) {
-
-}
-
-bool Controller::isValidMove(Link* l, const std::string& direction) {
-    if (direction != "up" && direction != "down" && direction != "left" && direction != "right") { return false; }
-    
-    if (l->getOwner() != currentTurn) {
-        return false;
-    }
+bool Controller::checkValidMove(Link* l, pair<int, int> location) {
+    int row = location.first;
+    int col = location.second;
 
     int height = board->getHeight();
     int width = board->getWidth();
-
-    pair<int, int> location = calculateMove(l, direction);
-    int row = location.first;
-    int col = location.second;
 
     if (col < 0 || col >= width) {
         return false;
@@ -161,8 +143,55 @@ bool Controller::isValidMove(Link* l, const std::string& direction) {
     return true;
 }
 
-bool Controller::isValidMove(Link& l, const std::string& directionFirst, const std::string& directionSecond) {
+void Controller::makeMove(Link& l, const std::string& direction, Player& p) {
+    if (!isValidMove(&l, direction)) {
+        return;
+        cout << "INVALID MOVE" << endl;
+    }
 
+    move(calculateMove(&l, direction), l, p);
+}
+
+void Controller::makeMove(Link& l, const std::string& directionFirst, const std::string& directionSecond, Player& p) {
+    if (!isValidMove(&l, directionFirst, directionSecond)) {
+        return;
+        cout << "INVALID MOVE" << endl;
+    }
+
+    move(calculateMove(&l, directionFirst, directionSecond), l, p);
+}
+
+bool Controller::isValidMove(Link* l, const std::string& direction) {
+    if (direction != "up" && direction != "down" && direction != "left" && direction != "right") { return false; }
+
+    if (l->getOwner() != currentTurn) {
+        return false;
+    }
+
+    return checkValidMove(l, calculateMove(l, direction));
+}
+
+bool Controller::isValidMove(Link* l, const std::string& directionFirst, const std::string& directionSecond) {
+    if (directionFirst != "up" && directionFirst != "down" && directionFirst != "left" && directionFirst != "right") { 
+        return false; 
+    }
+
+    if (directionFirst == "up" || directionFirst == "down") {
+        if (directionSecond != "left" && directionSecond != "right") { 
+            return false; 
+        }
+    }
+    else { // directionFirst == "left" || directionFirst == "right")
+        if (directionSecond != "up" && directionSecond != "down") { 
+            return false; 
+        }
+    }
+
+    if (l->getOwner() != currentTurn) {
+        return false;
+    }
+
+    return checkValidMove(l, calculateMove(l, directionFirst, directionSecond));
 }
 
 Link& Controller::battle(Link& initiator, Link& victim, Tile& battleTile, Tile& initiatorTile) {

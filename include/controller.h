@@ -25,8 +25,12 @@ class Controller {
         void makeMove(Link& l, const std::string& direction, Player& p);
         void makeMove(Link& l, const std::string& directionFirst, const std::string& directionSecond, Player& p);
 
+        void move(std::pair<int, int> location, Link& l, Player& p);
+
         bool isValidMove(Link* l, const std::string& direction);
-        bool isValidMove(Link& l, const std::string& directionFirst, const std::string& directionSecond);
+        bool isValidMove(Link* l, const std::string& directionFirst, const std::string& directionSecond);
+
+        bool checkValidMove(Link* l, std::pair<int, int> location);
 
         Link& battle(Link& l1, Link& l2, Tile& battleTile, Tile& initiatorTile);
         bool isMoveIntoOpponentServerPort(Tile* t);
