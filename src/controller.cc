@@ -29,34 +29,36 @@ void Controller::makeMove(Link& l, const std::string& direction, Player& p) {
 
     Tile* destination = board->getTileAt(row, col);
 
+    // if moving onto a firewall tile that isn't yours
     if (destination->isFirewallTile() && destination->getFirewallOwner() != &p) {
+        // reveal to all players
         for (auto& p : this->players) {
             p->reveal(&l);
         }
-
+        
+        // if it's a virus, then download it
         if (l.getLinkType() == LinkType::VIRUS) {
             l.getOwner()->download(&l);
             return;
         }
     }
     
+    // if moving onto tile which has a link that isn't yours
     if (destination->getOccupant() != nullptr && destination->getOccupant()->getOwner() != &p) {
-        Link& winner = battle(l, *destination->getOccupant(), *destination, *l.getTile());
-        Player& owner = *winner.getOwner();
-
-        if (&winner == &l) {
-            owner.download(destination->getOccupant());
-        }
-        else {
-            destination->getOccupant()->getOwner()->download(&l);
+        
+        // if the battle leads to your link losing (ie, don't need to move it), then return
+        if (&battle(l, *destination->getOccupant(), *destination, *l.getTile()) != &l) {
             return;
         }
     }
+    
+    // if moving onto a server port (and we know it'll be an opponent's server tile)
     else if (destination->isServerPortTile()) {
         destination->getServerPortOwner()->download(&l);
         return;
     }
 
+    // move the tile
     l.getTile()->setOccupant(nullptr);
     l.setTile(destination);
     destination->setOccupant(&l);
@@ -132,7 +134,24 @@ bool Controller::isValidMove(Link& l, const std::string& directionFirst, const s
 }
 
 Link& Controller::battle(Link& initiator, Link& victim, Tile& battleTile, Tile& initiatorTile) {
+    // reveal both links to all players
+    for (auto& p : this->players) {
+        p->reveal(&initiator);
+        p->reveal(&victim);
+    }
 
+    if (initiator.getStrength() == victim.getStrength()){ // links are same strength, initator wins
+        initiator.getOwner()->download(&victim);
+        return initiator;
+    }
+    else if (initiator.getStrength() > victim.getStrength()){
+        initiator.getOwner()->download(&victim);
+        return initiator;
+    }
+    else{
+        victim.getOwner()->download(&initiator);
+        return victim;
+    }
 }
 
 bool Controller::isMoveIntoOpponentServerPort(Tile* t) {
