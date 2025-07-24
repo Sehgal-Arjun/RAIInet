@@ -3,8 +3,8 @@
 
 #include <utility>
 #include "link.h"
-
-class Player;
+#include "tile.h"
+#include "player.h"
 
 enum class LinkType {
     DATA,
@@ -20,6 +20,8 @@ private:
     Player* owner; // non-owning
     LinkType linkType;
     int travelDistance;
+    Tile* place;
+
 
 public:
     BasicLink(int strength, bool isData, int x, int y, Player* owner) : strength{strength}, 
@@ -40,6 +42,8 @@ public:
     void setInUse(bool inUse) override;
     void setLocation(std::pair<int, int> loc) override;
     void setLinkType(LinkType t) override;
+    Tile* getTile() const override;
+    void setTile(Tile* t) override;
 };
 
 #endif // BASICLINK_H
