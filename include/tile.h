@@ -17,6 +17,7 @@ class Tile {
         void enableFirewall();
         void enableServerPort();
         void setOccupant(Link* l);
+        Link* getOccupant() const;
 };
 
 #endif
