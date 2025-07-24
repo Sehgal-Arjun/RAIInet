@@ -84,3 +84,11 @@ std::vector<std::unique_ptr<Link>> Board::randomiseLinks(Player* p) {
     }
     return randomisedOrder;
 }
+
+Tile* Board::getTileAt(int row, int col) const {
+    if (row < 0 || row >= height || col < 0 || col >= width) {
+        return nullptr;
+    }
+
+    return grid[row][col].get();
+}
