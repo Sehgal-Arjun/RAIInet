@@ -84,7 +84,7 @@ bool Controller::isMoveIntoOpponentServerPort(Tile* t) {
 }
 
 bool Controller::isMoveIntoOpponentFirewall(Tile* t) {
-
+    return (t->isFirewallTile() && t->getFirewallOwner() != currentTurn);
 }
 
 // useAbility for Download, Scan, Weakenify, and LinkBoost
