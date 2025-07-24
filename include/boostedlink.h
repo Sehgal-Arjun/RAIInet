@@ -15,7 +15,11 @@ public:
     Player* getOwner() const override;
     bool isInUse() const override;
     bool isKnight() const override;
-    void setInUse(bool inUse) = 0;
+    void setInUse(bool inUse) override;
+    void setLocation(std::pair<int, int> loc) override;
+    void setLinkType(LinkType t) override;
+    Tile* getTile() const override;
+    void setTile(Tile* t) override;
 };
 
 #endif // BOOSTEDLINK_H 

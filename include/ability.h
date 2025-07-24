@@ -7,33 +7,27 @@ class Link;
 class Player;
 class Tile;
 
-enum class AbilityID {
-    POLARIZE,
-    WEAKENIFY,
-    LINKBOOST,
-    UPLOADIFY,
-    SWAPIFY,
-    KNIGHTIFY,
-    SCAN,
-    DOWNLOAD,
-    FIREWALL
-};
-
 class Ability {
 protected:
     bool used;
     std::string name;
+    int id;
 public:
     virtual ~Ability() = default;
-    virtual void applyAbility(Link*) = 0;
-    virtual void applyAbility(Link*, Player*) = 0;
-    virtual void applyAbility(Link*, Tile*) = 0;
-    virtual void applyAbility(Link*, Link*) = 0;
-    virtual bool isValidUse(Link*) const = 0;
-    virtual bool isValidUse(Link*, Player*) const = 0;
-    virtual bool isValidUse(Link*, Tile*) const = 0;
-    virtual bool isValidUse(Link*, Link*) const = 0;
-    virtual AbilityID getID();
+    virtual void applyAbility(Link& l) = 0;
+    virtual void applyAbility(Tile& t) = 0;
+    virtual void applyAbility(Tile& t, Player& p) = 0;
+    virtual void applyAbility(Link& t, Player& p) = 0;
+    virtual void applyAbility(Link& l1, Link& l2) = 0;
+    virtual void applyAbility(Link& l, Player& p, Tile& location);
+    virtual bool isValidUse(Link* l) const = 0;
+    virtual bool isValidUse(Link* l, Player* p) const = 0;
+    virtual bool isValidUse(Link* l1, Link* l2) const = 0;
+    virtual bool isValidUse(Tile* t) const = 0;
+    virtual bool isValidUse(Link* l, Player* p, Tile& location) const;
+    int getID() const;
+    bool isUsed() const;
+    std::string getName() const;
 };
 
 #endif // ABILITY_H 

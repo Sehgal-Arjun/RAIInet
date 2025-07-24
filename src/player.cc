@@ -1,7 +1,11 @@
-#include "player.h"
-#include "link.h"
-#include "basiclink.h"
-#include <string>
+#include "../include/player.h"
+#include "../include/link.h"
+#include "../include/basiclink.h"
+#include "../include/ability.h"
+#include "../include/boostedlink.h"
+#include "../include/weakenedlink.h"
+#include "../include/knightedLink.h"
+#include <iostream>
 
 using namespace std;
 
@@ -10,23 +14,73 @@ void Player::download(Link* l){
     l->setInUse(false);
     
     // 2. move link to (-1, -1)
-    l->setLocation(pair(-1, -1));
+    l->setLocation(make_pair(-1, -1));
 
     // 3. increment data/virusAmountDownloaded
     if (l->getLinkType() == LinkType::DATA) {
-        this.dataAmountDownloaded++;
+        this->dataAmountDownloaded++;
     }
     else if (l->getLinkType() == LinkType::VIRUS){
-        this.virusAmountDownloaded++;
+        this->virusAmountDownloaded++;
+    }
+}
+
+void Player::upload(Link* l, pair<int, int> location){
+    // 1. mark link as in use
+    l->setInUse(true);
+    
+    // 2. move link to (-1, -1)
+    l->setLocation(location);
+
+    // 3. decrement data/virusAmountDownloaded
+    if (l->getLinkType() == LinkType::DATA) {
+        this->dataAmountDownloaded--;
+    }
+    else if (l->getLinkType() == LinkType::VIRUS){
+        this->virusAmountDownloaded--;
     }
 }
 
 void Player::printAbilities(std::ostream& out) {
     for (const auto& ability : chosenAbilities) {
-        out << ability->getID() << ". " << ability.getName()
-        << " " << (ability.isUsed() ? "(USED)" : "(UNUSED)")
-            << std::endl;
+        out << ability->getID() << ". " << ability->getName()
+        << " " << (ability->isUsed() ? "(USED)" : "(UNUSED)")
+            << '\n';
     }
 }
 
-vector<Ability> getAbilities(){ return chosenAbilities; }
+void Player::boostLink(Link* l, int boostAmount) {
+    for (auto& pair : links) {
+        if (pair.second.get() == l) {
+            pair.second = std::make_unique<BoostedLink>(l, boostAmount);
+            break;
+        }
+    }
+}
+
+void Player::weakenLink(Link* l, int debuffAmount) {
+    for (auto& pair : links) {
+        if (pair.second.get() == l) {
+            pair.second = std::make_unique<WeakenedLink>(l, debuffAmount);
+            break;
+        }
+    }
+}
+
+void Player::knightLink(Link* l) {
+    for (auto& pair : links) {
+        if (pair.second.get() == l) {
+            pair.second = std::make_unique<KnightedLink>(l);
+            break;
+        }
+    }
+}
+
+void Player::reveal(Link* l){
+    if (l->getLinkType() == LinkType::DATA){
+        knownOpponentLinks[l->getOwner()]["D" + std::to_string(l->getStrength())] = std::shared_ptr<Link>(l);
+    }
+    else if (l->getLinkType() == LinkType::VIRUS){
+        knownOpponentLinks[l->getOwner()]["V" + std::to_string(l->getStrength())] = std::shared_ptr<Link>(l);
+    }
+}

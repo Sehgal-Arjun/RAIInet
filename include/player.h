@@ -21,11 +21,14 @@ class Player {
     public:
         ~Player() = default;
         void download(Link* l);
+        void upload(Link* l, std::pair<int, int> location);
         void printAbilities(std::ostream& out);
-        std::vector<Ability*> getAbilities();
-
+        std::vector<Ability> getAbilities();
+        void boostLink(Link* l, int boostAmount);
+        void weakenLink(Link* l, int weakenAmount);
+        void knightLink(Link*l);
+        void reveal(Link* l);
         int getPlayerId() { return playerId; }
-
         const std::vector<std::unique_ptr<Ability>>& getChosenAbilities() const { return chosenAbilities; }
         std::vector<std::unique_ptr<Ability>>& getChosenAbilities() { return chosenAbilities; }
         const std::map<std::string, std::unique_ptr<Link>>& getLinks() const { return links; }

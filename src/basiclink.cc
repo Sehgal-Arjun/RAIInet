@@ -1,5 +1,5 @@
-#include "basiclink.h"
-#include "player.h"
+#include "../include/basiclink.h"
+#include "../include/player.h"
 
 using namespace std;
 
@@ -31,10 +31,14 @@ bool BasicLink::isKnight() const {
     return false;
 } 
 
-void setInUse(bool inUse) const {
+void BasicLink::setInUse(bool inUse) {
     this->inUse = inUse;
 }
 
-void setLocation(std::pair<int, int> loc) const {
+void BasicLink::setLocation(std::pair<int, int> loc) {
     this->location = loc;
+}
+
+void BasicLink::setLinkType(LinkType t) {
+    this->linkType = t;
 }

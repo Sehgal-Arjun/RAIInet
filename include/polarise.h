@@ -1,13 +1,12 @@
-#ifndef POLARIZE_H
-#define POLARIZE_H
+#ifndef POLARISE_H
+#define POLARISE_H
 
 #include "ability.h"
 
-class Polarize : public Ability {
+class Polarise : public Ability {
 public:
-    void applyAbility(Link*) override;
-    bool isValidUse(Link*) const override;
-    AbilityID getID() const override;
+    void applyAbility(Link& l) override;
+    bool isValidUse(Link* l) const override;
 };
 
-#endif // POLARIZE_H 
+#endif // POLARISE_H 
