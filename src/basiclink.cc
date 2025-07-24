@@ -34,3 +34,11 @@ void BasicLink::setInUse(bool inUse) {
 void BasicLink::setLinkType(LinkType t) {
     this->linkType = t;
 }
+
+Tile* BasicLink::getTile() const {
+    return place;
+}
+
+void BasicLink::setTile(Tile* t){
+    this->place = t;
+}
