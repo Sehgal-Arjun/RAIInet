@@ -3,7 +3,8 @@
 
 class Observer {
 public:
-    virtual void notify() = 0;
+    virtual void notifyCell(int r, int c, int change) = 0;
+    virtual void notifyFull() = 0;
     virtual ~Observer() = default;
 };
 

@@ -10,7 +10,8 @@ class Subject {
 public:
     void attach(Observer* o);
     void detach(Observer* o);
-    void notifyObservers();
+    void notifyObserversCell(int r, int c, int change);
+    void notifyObserversFull();
     virtual ~Subject() = default;
 };
 
