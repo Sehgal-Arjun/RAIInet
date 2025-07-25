@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 #include <sstream>
+#include <fstream>
 
 using namespace std;
 
@@ -463,8 +464,24 @@ bool Controller::executeCommand(string input){
     }
 
     else if (cmd == "board"){
-        
+        views.at(0)->print(cout);
     }
+
+    else if (cmd == "sequence") {
+        string filename;
+        stream >> filename;
+        ifstream file(filename);
+        string cmd;
+        while(getline(file, cmd)) {
+            executeCommand(cmd);
+        }
+    }
+
+    else if (cmd == "quit"){
+        return false;
+    }
+
+    return true;
 }
 
 void Controller::play(){

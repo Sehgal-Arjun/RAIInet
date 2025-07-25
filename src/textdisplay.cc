@@ -26,7 +26,7 @@ void TextDisplay::print(std::ostream& out) {
     out << "Player 1:\n";
     out << "Downloaded: " << p1->getDataAmountDownloaded() << "D, " << p1->getVirusAmountDownloaded() << "V\n";
     int p1Abilities = 0;
-    for (const auto& ab : p1->getChosenAbilities()) {
+    for (const auto& ab : p1->getAbilities()) {
         if (!ab->isUsed()) ++p1Abilities;
     }
     out << "Abilities: " << p1Abilities << "\n";
@@ -87,7 +87,7 @@ void TextDisplay::print(std::ostream& out) {
     out << "Player 2:\n";
     out << "Downloaded: " << p2->getDataAmountDownloaded() << "D, " << p2->getVirusAmountDownloaded() << "V\n";
     int p2Abilities = 0;
-    for (const auto& ab : p2->getChosenAbilities()) {
+    for (const auto& ab : p2->getAbilities()) {
         if (!ab->isUsed()) ++p2Abilities;
     }
     out << "Abilities: " << p2Abilities << "\n";
