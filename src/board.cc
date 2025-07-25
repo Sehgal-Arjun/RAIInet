@@ -99,7 +99,7 @@ vector<unique_ptr<Link>> Board::randomiseLinks(Player* p) {
 
         int strength = (i % 4) + 1;
 
-        randomisedOrder[linkNums[i]] = make_unique<BasicLink>(strength, isData, getTileAt(i, y), p);
+        randomisedOrder[linkNums[i]] = make_unique<BasicLink>(strength, isData, getTileAt(y, i), p);
     }
     return randomisedOrder;
 }
