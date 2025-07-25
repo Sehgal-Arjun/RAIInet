@@ -20,12 +20,13 @@ class Player {
         int playerId;
 
     public:
+        Player(int id) : playerId(id) {}
         ~Player() = default;
-        void assignLinks(std::vector<std::unique_ptr<Link>> links);
+        void assignLinks(std::vector<std::unique_ptr<Link>>&& links);
         void download(Link* l);
         void upload(Link* l, Tile* t);
         void printAbilities(std::ostream& out);
-        std::vector<std::unique_ptr<Ability>> getAbilities() const;
+        std::vector<std::unique_ptr<Ability>>& getAbilities();
         Ability* getAbility(int id) const;
         void boostLink(Link* l, int boostAmount);
         void weakenLink(Link* l, int weakenAmount);
