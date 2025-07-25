@@ -1,9 +1,9 @@
-#ifndef SWAPIFY_H
-#define SWAPIFY_H
+#ifndef WARPIFY_H
+#define WARPIFY_H
 
 #include "ability.h"
 
-class Swapify: public Ability {
+class Warpify: public Ability {
 public:
     void applyAbility(Link& l1, Link& l2) override;
     
@@ -11,4 +11,4 @@ public:
     bool isValidUse(Link* l1, Link* l2) const override;
 };
 
-#endif // SWAPIFY_H 
+#endif // WARPIFY_H 

@@ -254,7 +254,7 @@ void Controller::useAbility(Ability& a, Link& l){
     }
 }
 
-// useAbility for Swapify
+// useAbility for Warpify
 void Controller::useAbility(Ability& a, Link& l1, Link& l2){
     if (a.isValidUse(&l1, &l2)){
         a.applyAbility(l1, l2);
