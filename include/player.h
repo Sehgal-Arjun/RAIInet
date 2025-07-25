@@ -21,6 +21,7 @@ class Player {
 
     public:
         ~Player() = default;
+        void assignLinks(std::vector<std::unique_ptr<Link>> links);
         void download(Link* l);
         void upload(Link* l, Tile* t);
         void printAbilities(std::ostream& out);

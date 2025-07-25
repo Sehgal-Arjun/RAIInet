@@ -6,8 +6,22 @@
 #include "../include/weakenedlink.h"
 #include "../include/knightedLink.h"
 #include <iostream>
+#include <string>
 
 using namespace std;
+
+void Player::assignLinks(std::vector<std::unique_ptr<Link>> ls){
+    for (auto& link: ls){
+        LinkType type = link->getLinkType();
+        string strength = to_string(link->getStrength());
+        if (type == LinkType::DATA){
+            this->links["D" + strength] = std::move(link);
+        }
+        else if (type == LinkType::VIRUS){
+            this->links["V" + strength] = std::move(link);
+        }
+    }
+}
 
 void Player::download(Link* l){
     // 1. mark link as not in use

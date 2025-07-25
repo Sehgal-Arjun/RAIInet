@@ -23,12 +23,13 @@ private:
 
 
 public:
-    BasicLink(int strength, bool isData, int x, int y, Player* owner) : strength{strength}, 
+    BasicLink(int strength, bool isData, Tile* t, Player* owner) : strength{strength}, 
                                                                         isData{isData}, 
                                                                         inUse{true}, 
                                                                         owner{owner}, 
                                                                         linkType{isData ? LinkType::DATA : LinkType::VIRUS}, 
-                                                                        travelDistance{1} {}
+                                                                        travelDistance{1},
+                                                                        place{t} {}
 
     int getStrength() const override;
     int getTravelDistance() const override;

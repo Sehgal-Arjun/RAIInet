@@ -37,6 +37,19 @@ void Board::initialiseBoard(std::istream& in, vector<Player*> players) {
     grid.at(height - 1).at(width / 2)->setServerPortOwner(players.at(1));
     grid.at(height - 1).at(width / 2 - 1)->enableServerPort();    
     grid.at(height - 1).at(width / 2 - 1)->setServerPortOwner(players.at(1));
+
+    // for now, only supporting randomised link order
+    vector<std::unique_ptr<Link>> linksP1 = randomiseLinks( players.at(0));
+    vector<std::unique_ptr<Link>> linksP2 = randomiseLinks( players.at(1));
+
+    for (auto& l: linksP1){
+        l->getTile()->setOccupant(l.get());
+    }
+    for (auto& l: linksP2){
+        l->getTile()->setOccupant(l.get());
+    }
+    players.at(0)->assignLinks(linksP1);
+    players.at(1)->assignLinks(linksP2);
 }
 
 void Board::placeLink(Link& l, Tile* t) {
@@ -86,7 +99,7 @@ std::vector<std::unique_ptr<Link>> Board::randomiseLinks(Player* p) {
 
         int strength = (i % 4) + 1;
 
-        randomisedOrder[linkNums[i]] = std::make_unique<BasicLink>(strength, isData, i, y, p);
+        randomisedOrder[linkNums[i]] = std::make_unique<BasicLink>(strength, isData, getTileAt(i, y), p);
     }
     return randomisedOrder;
 }
