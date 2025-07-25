@@ -497,3 +497,7 @@ void Controller::play(){
         }
     }
 }
+
+void Controller::setPlayers(const std::vector<Player*>& players) {
+    this->players = players;
+}
