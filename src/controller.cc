@@ -2,6 +2,8 @@
 #include "../include/basiclink.h"
 
 #include <iostream>
+#include <memory>
+#include <sstream>
 
 using namespace std;
 
@@ -144,22 +146,24 @@ bool Controller::checkValidMove(Link* l, pair<int, int> location) {
     return true;
 }
 
-void Controller::makeMove(Link& l, const std::string& direction, Player& p) {
+bool Controller::makeMove(Link& l, const std::string direction, Player& p) {
     if (!isValidMove(&l, direction)) {
-        return;
         cout << "INVALID MOVE" << endl;
+        return false;
     }
 
     move(calculateMove(&l, direction), l, p);
+    return true;
 }
 
-void Controller::makeMove(Link& l, const std::string& directionFirst, const std::string& directionSecond, Player& p) {
+bool Controller::makeMove(Link& l, const std::string directionFirst, const std::string directionSecond, Player& p) {
     if (!isValidMove(&l, directionFirst, directionSecond)) {
-        return;
         cout << "INVALID MOVE" << endl;
+        return false;
     }
 
     move(calculateMove(&l, directionFirst, directionSecond), l, p);
+    return true;
 }
 
 bool Controller::isValidMove(Link* l, const std::string& direction) {
@@ -328,4 +332,151 @@ void Controller::switchTurn() {
 void Controller::addView(View* v) {
     views.push_back(v);
     board->attach(v);
+}
+
+Link* Controller::getLink(char name){
+    if ('a' <= name && name <= 'h') {
+        // if it's player 1's link
+        return players.at(0)->getLink(name);
+    }
+    else if ('A' <= name && name <= 'H') {
+        // if it's player 2's link
+        return players.at(1)->getLink(name);
+    }
+    else {
+        return nullptr;
+    }
+}
+
+bool Controller::executeCommand(string input){
+    istringstream stream(input);
+    string cmd;
+    stream >> cmd;
+    if (cmd == "move"){ // move a dir, but if link is a knight, then move a dir1 dir2
+        char l;
+        stream >> l;
+        Link* link = getLink(l);
+        if (link->isKnight()){
+            string direction1, direction2;
+            stream >> direction1 >> direction2;
+            if (makeMove(*link, direction1, direction2, *currentTurn)){
+                switchTurn();
+            }
+        }
+        else{
+            string direction;
+            stream >> direction;
+            if (makeMove(*link, direction, *currentTurn)){
+                switchTurn();
+            }
+        }
+    }
+
+    else if (cmd == "abilities"){
+        currentTurn->printAbilities(cout);
+    }
+
+    else if (cmd == "ability"){
+        int id;
+        stream >> id;
+        Ability* ability = currentTurn->getAbility(id);
+        if (ability == nullptr) {
+            cout << "Invalid ability ID!" << endl;
+        }
+        else {
+            if (ability->isUsed()){
+                cout << "Ability already used!" << endl;
+            }
+            else {
+                string next;
+                stream >> next;
+
+                if (ability->getName() == "Download" || 
+                    ability->getName() == "Scan" ||
+                    ability->getName() == "LinkBoost" ||
+                    ability->getName() == "Weakenify" ){
+                    // next should be the link, so should be a-h or A-H
+                    char link = next[0];
+                    if ((link <= 'h' && link >= 'a') || (link <= 'H' && link >= 'A')) {
+                        useAbility(*ability, *currentTurn, *getLink(link));
+                    }
+                    else{
+                        cout << "Invalid input!" << endl;
+                    }
+                }
+                
+                else if (ability->getName() == "Firewall" ) {    
+                    // next should be the tile, so should be 0-7, and need another char 0-7
+                    char x = next[0];
+                    char y;
+                    stream >> y;
+                    if (x <= 7 && x >= 0 && y <= 7 && y >= 0){
+                        useAbility(*ability, *currentTurn, *board->getTileAt(x, y));
+                    }
+                    else{
+                        cout << "Invalid input!" << endl;
+                    }
+                }
+
+                else if (ability->getName() == "Knightify" || ability->getName() == "Polarise"){
+                    // next should be the link, so should be a-h or A-H
+                    char link = next[0];
+                    if ((link <= 'h' && link >= 'a') || (link <= 'H' && link >= 'A')) {
+                        useAbility(*ability, *getLink(link));
+                    }
+                    else{
+                        cout << "Invalid input!" << endl;
+                    }
+                }
+
+                else if (ability->getName() == "Warpify"){
+                    // next should be a link, and need another link to warp with
+                    char link1 = next[0];
+                    char link2;
+                    stream >> link2;
+                    if (((link1 <= 'h' && link1 >= 'a') || (link1 <= 'H' && link1 >= 'A')) && ((link2 <= 'h' && link2 >= 'a') || (link2 <= 'H' && link2 >= 'A'))) {
+                        useAbility(*ability, *getLink(link1), *getLink(link2));
+                    }
+                    else{
+                        cout << "Invalid input!" << endl;
+                    }
+                }
+
+                else if (ability->getName() == "Uploadify") {
+                    // next shoud be a link, followed by the coordinates of a tile
+                    char link = next[0];
+                    char x, y;
+                    stream >> x >> y;
+                    if (((link <= 'h' && link >= 'a') || (link <= 'H' && link >= 'A')) && ((x >= 0 && x <= board->getWidth() - 1) && (y >= 0 && y <= board->getHeight() - 1))){
+                        useAbility(*ability, *currentTurn, *getLink(link), *board->getTileAt(x, y));
+                    }
+                    else {
+                        cout << "Invalid input!" << endl;
+                    }
+                }
+
+                else {
+                    cout << "Invalid ability! Name not found!" << endl;
+                }
+            }
+        }
+    }
+
+    else if (cmd == "board"){
+        
+    }
+}
+
+void Controller::play(){
+    currentTurn = players[0];
+    string input;
+    while(getline(cin, input)) {
+        if (!executeCommand(input)) {
+            break;
+        }
+        int winStatus = checkGameWon();
+        if (winStatus != 0) {
+            cout << "Player " << winStatus << " wins!" << endl; 
+        }
+    }
 }

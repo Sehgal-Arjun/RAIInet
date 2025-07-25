@@ -33,7 +33,7 @@ class Player {
         void reveal(Link* l);
         int getPlayerId() const;
         std::map<std::string, std::unique_ptr<Link>>& getLinks();
-        std::unique_ptr<Link> getLink(char link);
+        Link* getLink(char link);
         std::map<Player*, std::map<std::string, std::shared_ptr<Link>>>& getKnownOpponentLinks();
         int getDataAmountDownloaded();
         int getVirusAmountDownloaded();

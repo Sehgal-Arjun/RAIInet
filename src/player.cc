@@ -125,14 +125,13 @@ int Player::getPlayerId() const{ return playerId; }
 
 map<string, unique_ptr<Link>>& Player::getLinks() { return links; }
 
-unique_ptr<Link> Player::getLink(char link) {
+Link* Player::getLink(char link) {
     if (!((link >= 'a' && link <= 'h') || (link >= 'A' && link <= 'H'))) {
         return nullptr;
     }
     string key = string(1, link);
     auto it = this->links.find(key);
-    
-    return (it != this->links.end()) ? std::move(it->second) : nullptr;
+    return (it != this->links.end()) ? it->second.get() : nullptr;
 }
 
 map<Player*, map<string, shared_ptr<Link>>>& Player::getKnownOpponentLinks() {

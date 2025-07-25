@@ -18,6 +18,7 @@ class Controller {
     std::vector<View*> views;
     std::pair<int, int> calculateMove(Link* l, std::string direction);
     std::pair<int, int> calculateMove(Link* l, std::string direction1, std::string direction2);
+    Link* getLink(char name);
 
     public:
         Controller() : board(std::make_unique<Board>()) {}
@@ -25,8 +26,8 @@ class Controller {
         ~Controller() = default;
 
         void addView(View* v);
-        void makeMove(Link& l, const std::string& direction, Player& p);
-        void makeMove(Link& l, const std::string& directionFirst, const std::string& directionSecond, Player& p);
+        bool makeMove(Link& l, const std::string direction, Player& p);
+        bool makeMove(Link& l, const std::string directionFirst, const std::string directionSecond, Player& p);
 
         void move(std::pair<int, int> location, Link& l, Player& p);
 
@@ -45,6 +46,8 @@ class Controller {
         void useAbility(Ability& a, Player& p, Link& l, Tile& t);
         bool checkGameWon();
         void switchTurn();
+        bool executeCommand(std::string input);
+        void play();
 };
 
 #endif // CONTROLLER_H
