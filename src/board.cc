@@ -23,10 +23,10 @@ void Board::initialiseBoard(istream& in, vector<Player*> players) {
         for (int c = 0; c < width; ++c) {
             unique_ptr<Tile> tile = make_unique<Tile>();
             tile->setLocation(make_pair(r, c));
-            row.push_back(move(tile));
+            row.push_back(std::move(tile));
         }
 
-        grid.push_back(move(row));
+        grid.push_back(std::move(row));
     }
 
     grid.at(0).at(width / 2)->enableServerPort();
@@ -42,14 +42,24 @@ void Board::initialiseBoard(istream& in, vector<Player*> players) {
     vector<unique_ptr<Link>> linksP1 = randomiseLinks( players.at(0));
     vector<unique_ptr<Link>> linksP2 = randomiseLinks( players.at(1));
 
-    for (auto& l: linksP1){
-        l->getTile()->setOccupant(l.get());
+    for (int i = 0; i < grid.at(0).size(); i++){
+        int row = 0;
+        if (grid.at(0).at(i)->isServerPortTile()){
+            row = 1;
+        }
+        grid.at(row).at(i)->setOccupant(linksP1.at(i).get());
     }
-    for (auto& l: linksP2){
-        l->getTile()->setOccupant(l.get());
+
+    for (int i = 0; i < grid.at(height-1).size(); i++){
+        int row = height - 1;
+        if (grid.at(row).at(i)->isServerPortTile()){
+            row = height - 2;
+        }
+        grid.at(row).at(i)->setOccupant(linksP2.at(i).get());
     }
-    players.at(0)->assignLinks(move(linksP1));
-    players.at(1)->assignLinks(move(linksP2));
+
+    players.at(0)->assignLinks(std::move(linksP1));
+    players.at(1)->assignLinks(std::move(linksP2));
 }
 
 void Board::placeLink(Link& l, Tile* t) {
