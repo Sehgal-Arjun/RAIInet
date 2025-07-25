@@ -12,21 +12,21 @@
 
 using namespace std;
 
-void Board::initialiseBoard(std::istream& in, vector<Player*> players) {
+void Board::initialiseBoard(istream& in, vector<Player*> players) {
     height = 8;
     width = 8;
     grid.clear();
 
     for (int r = 0; r < height; ++r) {
-        std::vector<std::unique_ptr<Tile>> row;
+        vector<unique_ptr<Tile>> row;
 
         for (int c = 0; c < width; ++c) {
             unique_ptr<Tile> tile = make_unique<Tile>();
-            row.push_back(tile);
             tile->setLocation(make_pair(r, c));
+            row.push_back(move(tile));
         }
 
-        grid.push_back(std::move(row));
+        grid.push_back(move(row));
     }
 
     grid.at(0).at(width / 2)->enableServerPort();
@@ -39,8 +39,8 @@ void Board::initialiseBoard(std::istream& in, vector<Player*> players) {
     grid.at(height - 1).at(width / 2 - 1)->setServerPortOwner(players.at(1));
 
     // for now, only supporting randomised link order
-    vector<std::unique_ptr<Link>> linksP1 = randomiseLinks( players.at(0));
-    vector<std::unique_ptr<Link>> linksP2 = randomiseLinks( players.at(1));
+    vector<unique_ptr<Link>> linksP1 = randomiseLinks( players.at(0));
+    vector<unique_ptr<Link>> linksP2 = randomiseLinks( players.at(1));
 
     for (auto& l: linksP1){
         l->getTile()->setOccupant(l.get());
@@ -48,8 +48,8 @@ void Board::initialiseBoard(std::istream& in, vector<Player*> players) {
     for (auto& l: linksP2){
         l->getTile()->setOccupant(l.get());
     }
-    players.at(0)->assignLinks(linksP1);
-    players.at(1)->assignLinks(linksP2);
+    players.at(0)->assignLinks(move(linksP1));
+    players.at(1)->assignLinks(move(linksP2));
 }
 
 void Board::placeLink(Link& l, Tile* t) {
@@ -63,7 +63,7 @@ void Board::placeLink(Link& l, Tile* t) {
 
 void Board::reveal(Link* l, Player& p) {
     Player* owner = l->getOwner();
-    std::string label;
+    string label;
 
     for (const auto& pair : owner->getLinks()) {
         if (pair.second.get() == l) {
@@ -73,7 +73,7 @@ void Board::reveal(Link* l, Player& p) {
     }
 
     if (!label.empty()) {
-        p.getKnownOpponentLinks()[owner][label] = std::shared_ptr<Link>(l, [](Link*){});
+        p.getKnownOpponentLinks()[owner][label] = shared_ptr<Link>(l, [](Link*){});
     }
 
     auto loc = l->getTile()->getLocation();
@@ -82,14 +82,14 @@ void Board::reveal(Link* l, Player& p) {
     notifyObserversFull();
 }
 
-std::vector<std::unique_ptr<Link>> Board::randomiseLinks(Player* p) {
-    std::vector<int> linkNums = {0, 1, 2, 3, 4, 5, 6, 7};
+vector<unique_ptr<Link>> Board::randomiseLinks(Player* p) {
+    vector<int> linkNums = {0, 1, 2, 3, 4, 5, 6, 7};
 
-    std::random_device rd;
-    std::mt19937 g(rd());
-    std::shuffle(linkNums.begin(), linkNums.end(), g);
+    random_device rd;
+    mt19937 g(rd());
+    shuffle(linkNums.begin(), linkNums.end(), g);
 
-    std::vector<std::unique_ptr<Link>> randomisedOrder(8);
+    vector<unique_ptr<Link>> randomisedOrder(8);
 
     int y = (p->getPlayerId() == 2) ? height - 1 : 0;
     bool isData = true;
@@ -99,7 +99,7 @@ std::vector<std::unique_ptr<Link>> Board::randomiseLinks(Player* p) {
 
         int strength = (i % 4) + 1;
 
-        randomisedOrder[linkNums[i]] = std::make_unique<BasicLink>(strength, isData, getTileAt(i, y), p);
+        randomisedOrder[linkNums[i]] = make_unique<BasicLink>(strength, isData, getTileAt(i, y), p);
     }
     return randomisedOrder;
 }
