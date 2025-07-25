@@ -4,14 +4,14 @@
 #include "../include/ability.h"
 #include "../include/boostedlink.h"
 #include "../include/weakenedlink.h"
-#include "../include/knightedLink.h"
+#include "../include/knightedlink.h"
 #include <iostream>
 #include <memory>
 #include <string>
 
 using namespace std;
 
-void Player::assignLinks(vector<unique_ptr<Link>> ls){
+void Player::assignLinks(std::vector<std::unique_ptr<Link>>&& ls){
     char key;
     if (this->playerId == 1){
         key = 'a';
@@ -25,7 +25,7 @@ void Player::assignLinks(vector<unique_ptr<Link>> ls){
     }
 
     for (auto& link: ls){
-        this->links[string(1, key)] = move(link);
+        this->links[string(1, key)] = std::move(link);
         key++;
     }
 }
@@ -74,7 +74,7 @@ void Player::printAbilities(ostream& out) {
     }
 }
 
-vector<unique_ptr<Ability>> Player::getAbilities() const {
+std::vector<std::unique_ptr<Ability>>& Player::getAbilities() {
     return this->chosenAbilities;
 }
 

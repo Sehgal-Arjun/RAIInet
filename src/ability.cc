@@ -9,4 +9,15 @@ bool Ability::isUsed() const { return used; }
 
 string Ability::getName() const { return name; }
 
-// don't need implementations for the other functions here, as they're pure virtual
+void Ability::applyAbility(Link&, Player&, Tile&) {
+    // Default: do nothing
+}
+
+void Ability::applyAbility(Tile&, Player*) {
+    // Default: do nothing
+}
+
+bool Ability::isValidUse(Link*, Player*, Tile*) const {
+    // Default: not valid
+    return false;
+}
