@@ -102,6 +102,7 @@ void Controller::move(pair<int, int> location, Link& l, Player& p) {
     destination->setOccupant(&l);
 
     switchTurn();
+    board->notifyObserversFull();
 }
 
 bool Controller::checkValidMove(Link* l, pair<int, int> location) {
@@ -322,4 +323,9 @@ void Controller::switchTurn() {
             }
         }
     }
+}
+
+void Controller::addView(View* v) {
+    views.push_back(v);
+    board->attach(v);
 }
