@@ -8,12 +8,14 @@
 #include "link.h"
 #include "tile.h"
 #include "ability.h"
+#include "view.h"
 
 class Controller {
     std::unique_ptr<Board> board;
     std::vector<Player*> players;
     bool useGraphics;
     Player* currentTurn;
+    std::vector<View*> views;
     std::pair<int, int> calculateMove(Link* l, std::string direction);
     std::pair<int, int> calculateMove(Link* l, std::string direction1, std::string direction2);
 
@@ -22,6 +24,7 @@ class Controller {
         Controller(std::unique_ptr<Board> b) : board(std::move(b)) {}
         ~Controller() = default;
 
+        void addView(View* v) { views.push_back(v); }
         void makeMove(Link& l, const std::string& direction, Player& p);
         void makeMove(Link& l, const std::string& directionFirst, const std::string& directionSecond, Player& p);
 
