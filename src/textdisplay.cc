@@ -30,16 +30,18 @@ void TextDisplay::print(std::ostream& out) {
         if (!ab->isUsed()) ++p1Abilities;
     }
     out << "Abilities: " << p1Abilities << "\n";
-    for (char k = 'a'; k <= 'h'; ++k) {
+    for (int i = 0; i < 8; ++i) {
+        char k = 'a' + i;
         auto it = p1->getLinks().find(std::string(1, k));
         if (it != p1->getLinks().end()) {
             if (it->second) {
-                out << k << ": ";
-                out << it->second->makeString();
+                out << k << ": " << it->second->makeString();
             }
         }
+        if (i % 4 == 3) out << "\n";
+        else out << " ";
     }
-    out << "\n========\n";
+    out << "========\n";
 
     // --- Board ---
     int height = board->getHeight();
@@ -91,20 +93,22 @@ void TextDisplay::print(std::ostream& out) {
         if (!ab->isUsed()) ++p2Abilities;
     }
     out << "Abilities: " << p2Abilities << "\n";
-    // Print A-H links (from pov's perspective, use knownOpponentLinks)
+    // Print A-H links (from pov's perspective, use knownOpponentLinks) in two lines of four
     auto known = pov->getKnownOpponentLinks().find(opp);
-    for (char k = 'A'; k <= 'H'; ++k) {
+    for (int i = 0; i < 8; ++i) {
+        char k = 'A' + i;
         if (known != pov->getKnownOpponentLinks().end()) {
             auto it = known->second.find(std::string(1, k));
             if (it != known->second.end() && it->second) {
-                out << k << ": ";
-                out << it->second->makeString();
+                out << k << ": " << it->second->makeString();
             } else {
-                out << k << ": ? ";
+                out << k << ": ?";
             }
         } else {
-            out << k << ": ? ";
+            out << k << ": ?";
         }
+        if (i % 4 == 3) out << "\n";
+        else out << " ";
     }
     out << "\n";
 }

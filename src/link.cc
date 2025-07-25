@@ -6,7 +6,7 @@ using namespace std;
 
 string Link::makeString() {
     LinkType type = getLinkType();
-    string strength = string(1, getStrength());
+    string strength = std::to_string(getStrength());
     if (type == LinkType::DATA){
         return "D" + strength;
     }
