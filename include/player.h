@@ -25,27 +25,21 @@ class Player {
         void download(Link* l);
         void upload(Link* l, Tile* t);
         void printAbilities(std::ostream& out);
-        std::vector<Ability> getAbilities();
+        std::vector<std::unique_ptr<Ability>> getAbilities() const;
         void boostLink(Link* l, int boostAmount);
         void weakenLink(Link* l, int weakenAmount);
         void knightLink(Link*l);
         void reveal(Link* l);
-        int getPlayerId() { return playerId; }
-        const std::vector<std::unique_ptr<Ability>>& getChosenAbilities() const { return chosenAbilities; }
-        std::vector<std::unique_ptr<Ability>>& getChosenAbilities() { return chosenAbilities; }
-        const std::map<std::string, std::unique_ptr<Link>>& getLinks() const { return links; }
-        std::map<std::string, std::unique_ptr<Link>>& getLinks() { return links; }
-        const std::map<Player*, std::map<std::string, std::shared_ptr<Link>>>& getKnownOpponentLinks() const { return knownOpponentLinks; }
-        std::map<Player*, std::map<std::string, std::shared_ptr<Link>>>& getKnownOpponentLinks() { return knownOpponentLinks; }
-        int getDataAmountDownloaded() { return dataAmountDownloaded; }
-        int getVirusAmountDownloaded() { return virusAmountDownloaded; }
-        bool getHasWon() { return hasWon; }
-        bool getHasLost() { return hasLost; }
-        void setHasWon() { hasWon = true; }
-        void setHasLost() { hasLost = true; }
-
-
-
+        int getPlayerId() const;
+        std::map<std::string, std::unique_ptr<Link>>& getLinks();
+        std::unique_ptr<Link> getLink(char link);
+        std::map<Player*, std::map<std::string, std::shared_ptr<Link>>>& getKnownOpponentLinks();
+        int getDataAmountDownloaded();
+        int getVirusAmountDownloaded();
+        bool getHasWon();
+        bool getHasLost();
+        void setHasWon();
+        void setHasLost();
 };
 
 #endif // PLAYER_H
