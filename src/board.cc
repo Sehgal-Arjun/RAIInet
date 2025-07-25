@@ -42,7 +42,10 @@ void Board::initialiseBoard(std::istream& in, vector<Player*> players) {
 void Board::placeLink(Link& l, Tile* t) {
     t->setOccupant(&l);
     l.setTile(t);
-    notifyObservers();
+    auto loc = t->getLocation();
+    int change = (l.getLinkType() == LinkType::DATA) ? 2 : 3; // 2: data, 3: virus
+    notifyObserversCell(loc.first, loc.second, change);
+    notifyObserversFull();
 }
 
 void Board::reveal(Link* l, Player& p) {
@@ -60,7 +63,10 @@ void Board::reveal(Link* l, Player& p) {
         p.getKnownOpponentLinks()[owner][label] = std::shared_ptr<Link>(l, [](Link*){});
     }
 
-    notifyObservers();
+    auto loc = l->getTile()->getLocation();
+    int change = (l->getLinkType() == LinkType::DATA) ? 2 : 3;
+    notifyObserversCell(loc.first, loc.second, change);
+    notifyObserversFull();
 }
 
 std::vector<std::unique_ptr<Link>> Board::randomiseLinks(Player* p) {
