@@ -1,6 +1,5 @@
 #include "../include/basiclink.h"
 #include "../include/player.h"
-#include <string>
 
 using namespace std;
 
@@ -42,18 +41,4 @@ Tile* BasicLink::getTile() const {
 
 void BasicLink::setTile(Tile* t){
     this->place = t;
-}
-
-string BasicLink::makeString(){
-    LinkType type = getLinkType();
-    string strength = string(1, getStrength());
-    if (type == LinkType::DATA){
-        return "D" + strength;
-    }
-    else if (type == LinkType::VIRUS){
-        return "V" + strength;
-    }
-    else {
-        return "ERROR";
-    }
 }

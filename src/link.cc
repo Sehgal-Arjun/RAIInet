@@ -1,3 +1,19 @@
 #include "../include/link.h"
+#include "../include/basiclink.h"
+#include <string>
 
-// no implementation needed, since Link is pure virtual
+using namespace std;
+
+string Link::makeString() {
+    LinkType type = getLinkType();
+    string strength = string(1, getStrength());
+    if (type == LinkType::DATA){
+        return "D" + strength;
+    }
+    else if (type == LinkType::VIRUS){
+        return "V" + strength;
+    }
+    else {
+        return "ERROR";
+    }
+}
