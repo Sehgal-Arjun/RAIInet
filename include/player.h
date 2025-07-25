@@ -26,6 +26,7 @@ class Player {
         void upload(Link* l, Tile* t);
         void printAbilities(std::ostream& out);
         std::vector<std::unique_ptr<Ability>> getAbilities() const;
+        Ability* getAbility(int id) const;
         void boostLink(Link* l, int boostAmount);
         void weakenLink(Link* l, int weakenAmount);
         void knightLink(Link*l);

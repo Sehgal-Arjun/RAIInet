@@ -78,6 +78,11 @@ vector<unique_ptr<Ability>> Player::getAbilities() const {
     return this->chosenAbilities;
 }
 
+Ability* Player::getAbility(int id) const {
+    if (id > 4) { return nullptr; }
+    return this->chosenAbilities.at(id).get();
+}
+
 void Player::boostLink(Link* l, int boostAmount) {
     for (auto& pair : links) {
         if (pair.second.get() == l) {
