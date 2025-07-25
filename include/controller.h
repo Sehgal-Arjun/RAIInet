@@ -24,7 +24,7 @@ class Controller {
         Controller(std::unique_ptr<Board> b) : board(std::move(b)) {}
         ~Controller() = default;
 
-        void addView(View* v) { views.push_back(v); }
+        void addView(View* v);
         void makeMove(Link& l, const std::string& direction, Player& p);
         void makeMove(Link& l, const std::string& directionFirst, const std::string& directionSecond, Player& p);
 
