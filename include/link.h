@@ -21,6 +21,7 @@ public:
     virtual void setLinkType(LinkType t) = 0;
     virtual Tile* getTile() const = 0;
     virtual void setTile(Tile* t) = 0;
+    virtual std::string makeString() = 0;
 };
 
 #endif // LINK_H 
