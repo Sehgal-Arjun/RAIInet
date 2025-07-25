@@ -11,15 +11,21 @@
 using namespace std;
 
 void Player::assignLinks(std::vector<std::unique_ptr<Link>> ls){
+    char key;
+    if (this->playerId == 1){
+        key = 'a';
+    }
+    else if (this->playerId == 2){
+        key = 'A';
+    }
+    else{
+        cout << "ERROR! invalid playerId!" << endl;
+        return;
+    }
+
     for (auto& link: ls){
-        LinkType type = link->getLinkType();
-        string strength = to_string(link->getStrength());
-        if (type == LinkType::DATA){
-            this->links["D" + strength] = std::move(link);
-        }
-        else if (type == LinkType::VIRUS){
-            this->links["V" + strength] = std::move(link);
-        }
+        this->links[string(1, key)] = std::move(link);
+        key++;
     }
 }
 
