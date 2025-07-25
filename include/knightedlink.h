@@ -16,6 +16,7 @@ public:
     void setLinkType(LinkType t) override;
     Tile* getTile() const override;
     void setTile(Tile* t) override;
+    std::string makeString() override;
 };
 
 #endif // KNIGHTEDLINK_H 

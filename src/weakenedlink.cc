@@ -1,4 +1,6 @@
 #include "../include/weakenedlink.h"
+#include "../include/basiclink.h"
+#include <string>
 
 using namespace std;
 
@@ -43,4 +45,18 @@ Tile* WeakenedLink::getTile() const {
 
 void WeakenedLink::setTile(Tile* t){
     next->setTile(t);
+}
+
+string WeakenedLink::makeString(){
+    LinkType type = getLinkType();
+    string strength = string(1, getStrength());
+    if (type == LinkType::DATA){
+        return "D" + strength;
+    }
+    else if (type == LinkType::VIRUS){
+        return "V" + strength;
+    }
+    else {
+        return "ERROR";
+    }
 }

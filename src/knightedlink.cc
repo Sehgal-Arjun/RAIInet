@@ -1,4 +1,6 @@
 #include "../include/knightedlink.h"
+#include "../include/basiclink.h"
+#include <string>
 
 using namespace std;
 
@@ -43,3 +45,18 @@ Tile* KnightedLink::getTile() const {
 void KnightedLink::setTile(Tile* t){
     next->setTile(t);
 }
+
+string KnightedLink::makeString(){
+    LinkType type = getLinkType();
+    string strength = string(1, getStrength());
+    if (type == LinkType::DATA){
+        return "D" + strength;
+    }
+    else if (type == LinkType::VIRUS){
+        return "V" + strength;
+    }
+    else {
+        return "ERROR";
+    }
+}
+
