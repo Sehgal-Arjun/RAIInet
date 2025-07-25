@@ -25,25 +25,29 @@ class Controller {
         Controller(std::unique_ptr<Board> b) : board(std::move(b)) {}
         ~Controller() = default;
 
+        void setPlayers(const std::vector<Player*>& ps);
+
         void addView(View* v);
+
         bool makeMove(Link& l, const std::string direction, Player& p);
         bool makeMove(Link& l, const std::string directionFirst, const std::string directionSecond, Player& p);
-
         void move(std::pair<int, int> location, Link& l, Player& p);
 
         bool isValidMove(Link* l, const std::string& direction);
         bool isValidMove(Link* l, const std::string& directionFirst, const std::string& directionSecond);
-
         bool checkValidMove(Link* l, std::pair<int, int> location);
 
         Link& battle(Link& l1, Link& l2, Tile& battleTile, Tile& initiatorTile);
+
         bool isMoveIntoOpponentServerPort(Tile* t);
         bool isMoveIntoOpponentFirewall(Tile* t);
+
         void useAbility(Ability& a, Player& p, Link& l);
         void useAbility(Ability& a, Player& p, Tile& t);
         void useAbility(Ability& a, Link& l);
         void useAbility(Ability& a, Link& l1, Link& l2);
         void useAbility(Ability& a, Player& p, Link& l, Tile& t);
+
         bool checkGameWon();
         void switchTurn();
         bool executeCommand(std::string input);
