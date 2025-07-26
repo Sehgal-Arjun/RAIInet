@@ -28,6 +28,10 @@ class Controller {
         void setPlayers(const std::vector<Player*>& ps);
 
         void addView(View* v);
+        
+        Board* getBoard() const { return board.get(); }
+        
+        Player* getCurrentTurn() const { return currentTurn; }
 
         bool makeMove(Link& l, const std::string direction, Player& p);
         bool makeMove(Link& l, const std::string directionFirst, const std::string directionSecond, Player& p);
