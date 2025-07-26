@@ -5,7 +5,7 @@
 
 using namespace std;
 
-TextDisplay::TextDisplay(Board* b, std::vector<Player*>* ps, Player* persp)
+TextDisplay::TextDisplay(Board* b, vector<Player*>* ps, Player* persp)
     : board(b), players(ps), perspective(persp) {}
 
 void TextDisplay::notifyCell(int r, int c, int change) {
@@ -13,10 +13,10 @@ void TextDisplay::notifyCell(int r, int c, int change) {
 }
 
 void TextDisplay::notifyFull() {
-    print(std::cout);
+    print(cout);
 }
 
-void TextDisplay::print(std::ostream& out) {
+void TextDisplay::print(ostream& out) {
     Player* p1 = (*players)[0];
     Player* p2 = (*players)[1];
     Player* pov = perspective;
@@ -32,7 +32,7 @@ void TextDisplay::print(std::ostream& out) {
     out << "Abilities: " << p1Abilities << "\n";
     for (int i = 0; i < 8; ++i) {
         char k = 'a' + i;
-        auto it = p1->getLinks().find(std::string(1, k));
+        auto it = p1->getLinks().find(string(1, k));
         if (it != p1->getLinks().end()) {
             if (it->second) {
                 out << k << ": " << it->second->makeString();
@@ -98,7 +98,7 @@ void TextDisplay::print(std::ostream& out) {
     for (int i = 0; i < 8; ++i) {
         char k = 'A' + i;
         if (known != pov->getKnownOpponentLinks().end()) {
-            auto it = known->second.find(std::string(1, k));
+            auto it = known->second.find(string(1, k));
             if (it != known->second.end() && it->second) {
                 out << k << ": " << it->second->makeString();
             } else {
@@ -111,4 +111,6 @@ void TextDisplay::print(std::ostream& out) {
         else out << " ";
     }
     out << "\n";
+
+    out << "Player " << pov->getPlayerId() << "'s turn! \n";
 }
