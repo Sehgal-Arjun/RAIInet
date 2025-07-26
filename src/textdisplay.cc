@@ -2,18 +2,22 @@
 #include <map>
 #include <string>
 #include "../include/textdisplay.h"
+#include "../include/controller.h"
 
 using namespace std;
 
-TextDisplay::TextDisplay(Board* b, vector<Player*>* ps, Player* persp)
-    : board(b), players(ps), perspective(persp) {}
+TextDisplay::TextDisplay(Board* b, std::vector<Player*>* ps, Player* persp, Controller* ctrl)
+    : board(b), players(ps), perspective(persp), controller(ctrl) {}
 
 void TextDisplay::notifyCell(int r, int c, int change) {
     // Empty for now
 }
 
 void TextDisplay::notifyFull() {
-    print(cout);
+    // Only print if this display's perspective matches the current turn
+    if (controller && controller->getCurrentTurn() == perspective) {
+        print(std::cout);
+    }
 }
 
 void TextDisplay::print(ostream& out) {
@@ -30,16 +34,43 @@ void TextDisplay::print(ostream& out) {
         if (!ab->isUsed()) ++p1Abilities;
     }
     out << "Abilities: " << p1Abilities << "\n";
-    for (int i = 0; i < 8; ++i) {
-        char k = 'a' + i;
-        auto it = p1->getLinks().find(string(1, k));
-        if (it != p1->getLinks().end()) {
-            if (it->second) {
-                out << k << ": " << it->second->makeString();
+    
+    // Show Player 1's links from the current perspective
+    if (pov == p1) {
+        // If viewing from Player 1's perspective, show all their links
+        for (int i = 0; i < 8; ++i) {
+            char k = 'a' + i;
+            auto it = p1->getLinks().find(std::string(1, k));
+            if (it != p1->getLinks().end()) {
+                if (it->second) {
+                    out << k << ": " << it->second->makeString();
+                } else {
+                    out << k << ": ?";
+                }
+            } else {
+                out << k << ": ?";
             }
+            if (i % 4 == 3) out << "\n";
+            else out << " ";
         }
-        if (i % 4 == 3) out << "\n";
-        else out << " ";
+    } else {
+        // If viewing from Player 2's perspective, only show what Player 2 knows
+        auto known = pov->getKnownOpponentLinks().find(p1);
+        for (int i = 0; i < 8; ++i) {
+            char k = 'a' + i;
+            if (known != pov->getKnownOpponentLinks().end()) {
+                auto it = known->second.find(std::string(1, k));
+                if (it != known->second.end() && it->second) {
+                    out << k << ": " << it->second->makeString();
+                } else {
+                    out << k << ": ?";
+                }
+            } else {
+                out << k << ": ?";
+            }
+            if (i % 4 == 3) out << "\n";
+            else out << " ";
+        }
     }
     out << "========\n";
 
@@ -93,22 +124,43 @@ void TextDisplay::print(ostream& out) {
         if (!ab->isUsed()) ++p2Abilities;
     }
     out << "Abilities: " << p2Abilities << "\n";
-    // Print A-H links (from pov's perspective, use knownOpponentLinks) in two lines of four
-    auto known = pov->getKnownOpponentLinks().find(opp);
-    for (int i = 0; i < 8; ++i) {
-        char k = 'A' + i;
-        if (known != pov->getKnownOpponentLinks().end()) {
-            auto it = known->second.find(string(1, k));
-            if (it != known->second.end() && it->second) {
-                out << k << ": " << it->second->makeString();
+    
+    // Show Player 2's links from the current perspective
+    if (pov == p2) {
+        // If viewing from Player 2's perspective, show all their links
+        for (int i = 0; i < 8; ++i) {
+            char k = 'A' + i;
+            auto it = p2->getLinks().find(std::string(1, k));
+            if (it != p2->getLinks().end()) {
+                if (it->second) {
+                    out << k << ": " << it->second->makeString();
+                } else {
+                    out << k << ": ?";
+                }
             } else {
                 out << k << ": ?";
             }
-        } else {
-            out << k << ": ?";
+            if (i % 4 == 3) out << "\n";
+            else out << " ";
         }
-        if (i % 4 == 3) out << "\n";
-        else out << " ";
+    } else {
+        // If viewing from Player 1's perspective, only show what Player 1 knows
+        auto known = pov->getKnownOpponentLinks().find(p2);
+        for (int i = 0; i < 8; ++i) {
+            char k = 'A' + i;
+            if (known != pov->getKnownOpponentLinks().end()) {
+                auto it = known->second.find(std::string(1, k));
+                if (it != known->second.end() && it->second) {
+                    out << k << ": " << it->second->makeString();
+                } else {
+                    out << k << ": ?";
+                }
+            } else {
+                out << k << ": ?";
+            }
+            if (i % 4 == 3) out << "\n";
+            else out << " ";
+        }
     }
     out << "\n";
 
