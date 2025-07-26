@@ -48,6 +48,7 @@ void Board::initialiseBoard(istream& in, vector<Player*> players) {
             row = 1;
         }
         grid.at(row).at(i)->setOccupant(linksP1.at(i).get());
+        linksP1.at(i)->setTile(grid.at(row).at(i).get());
     }
 
     for (int i = 0; i < grid.at(height-1).size(); i++){
@@ -56,6 +57,7 @@ void Board::initialiseBoard(istream& in, vector<Player*> players) {
             row = height - 2;
         }
         grid.at(row).at(i)->setOccupant(linksP2.at(i).get());
+        linksP2.at(i)->setTile(grid.at(row).at(i).get());
     }
 
     players.at(0)->assignLinks(std::move(linksP1));
@@ -120,4 +122,12 @@ Tile* Board::getTileAt(int row, int col) const {
     }
 
     return grid[row][col].get();
+}
+
+int Board::getHeight() const {
+    return height;
+}
+
+int Board::getWidth() const {
+    return width;
 }

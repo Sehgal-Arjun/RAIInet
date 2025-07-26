@@ -16,8 +16,8 @@ class Board : public Subject {
         void placeLink(Link& l, Tile* t);
         void reveal(Link* l, Player& p);
         Tile* getTileAt(int row, int col) const;
-        int getHeight() {return height;}
-        int getWidth() {return width;}
+        int getHeight() const;
+        int getWidth() const;
 
     private:
         std::vector<std::unique_ptr<Link>> randomiseLinks(Player* p);
