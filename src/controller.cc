@@ -104,8 +104,7 @@ void Controller::move(pair<int, int> location, Link& l, Player& p) {
     l.setTile(destination);
     destination->setOccupant(&l);
 
-    switchTurn();
-    board->notifyObserversFull();
+    // Don't notify observers here - will be done after turn switch
 }
 
 bool Controller::checkValidMove(Link* l, pair<int, int> location) {
@@ -167,14 +166,19 @@ bool Controller::makeMove(Link& l, const std::string directionFirst, const std::
     return true;
 }
 
-bool Controller::isValidMove(Link* l, const std::string& direction) {
-    if (direction != "up" && direction != "down" && direction != "left" && direction != "right") { return false; }
+bool Controller::isValidMove(Link* l, const std::string& direction) {    
+    if (direction != "up" && direction != "down" && direction != "left" && direction != "right") { 
+        return false; 
+    }
 
     if (l->getOwner() != currentTurn) {
         return false;
     }
 
-    return checkValidMove(l, calculateMove(l, direction));
+    pair<int, int> targetLocation = calculateMove(l, direction);
+    bool result = checkValidMove(l, targetLocation);
+    
+    return result;
 }
 
 bool Controller::isValidMove(Link* l, const std::string& directionFirst, const std::string& directionSecond) {
@@ -325,6 +329,7 @@ void Controller::switchTurn() {
             
             if (cur) {
                 currentTurn = p;
+                break;
             }
         }
     }
@@ -349,7 +354,7 @@ Link* Controller::getLink(char name){
     }
 }
 
-bool Controller::executeCommand(string input){
+bool Controller::executeCommand(string input){    
     istringstream stream(input);
     string cmd;
     stream >> cmd;
@@ -357,11 +362,13 @@ bool Controller::executeCommand(string input){
         char l;
         stream >> l;
         Link* link = getLink(l);
+        
         if (link->isKnight()){
             string direction1, direction2;
             stream >> direction1 >> direction2;
             if (makeMove(*link, direction1, direction2, *currentTurn)){
                 switchTurn();
+                board->notifyObserversFull();
             }
         }
         else{
@@ -369,6 +376,7 @@ bool Controller::executeCommand(string input){
             stream >> direction;
             if (makeMove(*link, direction, *currentTurn)){
                 switchTurn();
+                board->notifyObserversFull();
             }
         }
     }
