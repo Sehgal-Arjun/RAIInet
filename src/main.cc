@@ -18,8 +18,8 @@ int main(int argc, char* argv[]) {
     std::unique_ptr<Board> board(new Board());
     board->initialiseBoard(std::cin, players);
 
-    // Create controller
-    Controller controller;
+    // Create controller with the initialized board
+    Controller controller(std::move(board));
     controller.setPlayers(players);
 
     // Check for -graphics argument
@@ -32,15 +32,14 @@ int main(int argc, char* argv[]) {
     }
 
     // Create displays for each player perspective
-    TextDisplay* textDisplay1 = new TextDisplay(board.get(), &players, p1.get());
-    TextDisplay* textDisplay2 = new TextDisplay(board.get(), &players, p2.get());
+    TextDisplay* textDisplay1 = new TextDisplay(controller.getBoard(), &players, p1.get(), &controller);
+    TextDisplay* textDisplay2 = new TextDisplay(controller.getBoard(), &players, p2.get(), &controller);
     controller.addView(textDisplay1);
     controller.addView(textDisplay2);
 
     if (useGraphics) {
-        std::cout << "Graphics enabled." << std::endl;
-        GraphicDisplay* graphicDisplay1 = new GraphicDisplay(board.get(), &players, p1.get(), 8);
-        GraphicDisplay* graphicDisplay2 = new GraphicDisplay(board.get(), &players, p2.get(), 8);
+        GraphicDisplay* graphicDisplay1 = new GraphicDisplay(controller.getBoard(), &players, p1.get(), 8);
+        GraphicDisplay* graphicDisplay2 = new GraphicDisplay(controller.getBoard(), &players, p2.get(), 8);
         controller.addView(graphicDisplay1);
         controller.addView(graphicDisplay2);
     }
