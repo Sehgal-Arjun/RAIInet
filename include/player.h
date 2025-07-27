@@ -28,6 +28,7 @@ class Player {
         void printAbilities(std::ostream& out);
         std::vector<std::unique_ptr<Ability>>& getAbilities();
         Ability* getAbility(int id) const;
+        void addAbility(Ability* a);
         void boostLink(Link* l, int boostAmount);
         void weakenLink(Link* l, int weakenAmount);
         void knightLink(Link*l);

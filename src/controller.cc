@@ -238,6 +238,7 @@ void Controller::useAbility(Ability& a, Player& p, Link& l) {
 
     if (a.isValidUse(&l, &p)){
         a.applyAbility(l, p);
+        a.setUsed(true);
     }
     else {
         cout << "INVALID ABILITY: " << a.getName() << endl;
@@ -248,6 +249,7 @@ void Controller::useAbility(Ability& a, Player& p, Link& l) {
 void Controller::useAbility(Ability& a, Player& p, Tile& t) {
     if (a.isValidUse(&t)){
         a.applyAbility(t, p);
+        a.setUsed(true);
     }
     else{
         cout << "INVALID ABILITY: " << a.getName() << endl;
@@ -258,6 +260,7 @@ void Controller::useAbility(Ability& a, Player& p, Tile& t) {
 void Controller::useAbility(Ability& a, Link& l){
     if (a.isValidUse(&l)){
         a.applyAbility(l);
+        a.setUsed(true);
     }
     else{
         cout << "INVALID ABILITY: " << a.getName() << endl;
@@ -268,6 +271,7 @@ void Controller::useAbility(Ability& a, Link& l){
 void Controller::useAbility(Ability& a, Link& l1, Link& l2){
     if (a.isValidUse(&l1, &l2)){
         a.applyAbility(l1, l2);
+        a.setUsed(true);
     }
     else{
         cout << "INVALID ABILITY: " << a.getName() << endl;
@@ -278,6 +282,7 @@ void Controller::useAbility(Ability& a, Link& l1, Link& l2){
 void Controller::useAbility(Ability& a, Player& p, Link& l, Tile& t){
     if (a.isValidUse(&l, &p, &t)){
         a.applyAbility(l, p, t);
+        a.setUsed(true);
     }
     else{
         cout << "INVALID ABILITY: " << a.getName() << endl;
@@ -472,7 +477,7 @@ bool Controller::executeCommand(string input){
     }
 
     else if (cmd == "board"){
-        views.at(0)->print(cout);
+        views.at(currentTurn->getPlayerId() - 1)->print(cout);
     }
 
     else if (cmd == "sequence") {

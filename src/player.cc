@@ -45,6 +45,8 @@ void Player::download(Link* l){
     else if (l->getLinkType() == LinkType::VIRUS){
         this->virusAmountDownloaded++;
     }
+    cout << "D" << to_string(dataAmountDownloaded) << endl;
+    cout << "V" << to_string(virusAmountDownloaded) << endl;
 }
 
 void Player::upload(Link* l, Tile* tile){
@@ -81,6 +83,10 @@ std::vector<std::unique_ptr<Ability>>& Player::getAbilities() {
 Ability* Player::getAbility(int id) const {
     if (id > 4) { return nullptr; }
     return this->chosenAbilities.at(id).get();
+}
+
+void Player::addAbility(Ability* a){
+    this->chosenAbilities.push_back(unique_ptr<Ability>(a));
 }
 
 void Player::boostLink(Link* l, int boostAmount) {
@@ -140,7 +146,7 @@ map<Player*, map<string, shared_ptr<Link>>>& Player::getKnownOpponentLinks() {
 
 int Player::getDataAmountDownloaded(){ return dataAmountDownloaded; }
 
-int Player::getVirusAmountDownloaded(){ return dataAmountDownloaded; }
+int Player::getVirusAmountDownloaded(){ return virusAmountDownloaded; }
 
 bool Player::getHasWon() { return hasWon; }
 
