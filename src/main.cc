@@ -18,6 +18,8 @@
 #include <memory>
 #include <cstring>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 using namespace std;
 
@@ -25,6 +27,8 @@ int main(int argc, char* argv[]) {
     // Default ability orders (LinkBoost, Firewall, Download, Scan, Polarize)
     string ability1Order = "LFDSP";
     string ability2Order = "LFDSP";
+    string link1File = "";
+    string link2File = "";
     bool useGraphics = false;
 
     // Parse command line arguments
@@ -50,6 +54,24 @@ int main(int argc, char* argv[]) {
                 return 1;
             }
         }
+        else if (strcmp(argv[i], "-link1") == 0) {
+            if (i + 1 < argc) {
+                link1File = argv[i + 1];
+                ++i; // Skip the next argument since we used it
+            } else {
+                cerr << "Error: -link1 requires a placement file" << endl;
+                return 1;
+            }
+        }
+        else if (strcmp(argv[i], "-link2") == 0) {
+            if (i + 1 < argc) {
+                link2File = argv[i + 1];
+                ++i; // Skip the next argument since we used it
+            } else {
+                cerr << "Error: -link2 requires a placement file" << endl;
+                return 1;
+            }
+        }
     }
 
     // Validate ability orders
@@ -62,14 +84,53 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    // Read link placement files if provided
+    vector<string> link1Order, link2Order;
+    
+    if (!link1File.empty()) {
+        ifstream file(link1File);
+        if (!file.is_open()) {
+            cerr << "Error: Cannot open link placement file: " << link1File << endl;
+            return 1;
+        }
+        string link;
+        while (file >> link && link1Order.size() < 8) {
+            link1Order.push_back(link);
+        }
+        file.close();
+        
+        if (link1Order.size() != 8) {
+            cerr << "Error: Link placement file must contain exactly 8 links for player 1" << endl;
+            return 1;
+        }
+    }
+    
+    if (!link2File.empty()) {
+        ifstream file(link2File);
+        if (!file.is_open()) {
+            cerr << "Error: Cannot open link placement file: " << link2File << endl;
+            return 1;
+        }
+        string link;
+        while (file >> link && link2Order.size() < 8) {
+            link2Order.push_back(link);
+        }
+        file.close();
+        
+        if (link2Order.size() != 8) {
+            cerr << "Error: Link placement file must contain exactly 8 links for player 2" << endl;
+            return 1;
+        }
+    }
+
     // Create players
     unique_ptr<Player> p1(new Player(1));
     unique_ptr<Player> p2(new Player(2));
     vector<Player*> players{p1.get(), p2.get()};
 
-    // Create board and initialize
+    // Create board and initialize with custom link orders if provided
     unique_ptr<Board> board(new Board());
-    board->initialiseBoard(cin, players);
+    board->initialiseBoard(cin, players, link1Order, link2Order);
 
     // Create controller with the initialized board
     Controller controller(std::move(board));
