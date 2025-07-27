@@ -76,22 +76,28 @@ void Board::placeLink(Link& l, Tile* t) {
 void Board::reveal(Link* l, Player& p) {
     Player* owner = l->getOwner();
     string label;
+    const std::unique_ptr<Link>* linkPtr = nullptr;
 
     for (const auto& pair : owner->getLinks()) {
         if (pair.second.get() == l) {
             label = pair.first;
+            linkPtr = &pair.second;
             break;
         }
     }
 
-    if (!label.empty()) {
-        p.getKnownOpponentLinks()[owner][label] = shared_ptr<Link>(l, [](Link*){});
+    if (!label.empty() && linkPtr) {
+        // Use a non-owning shared_ptr to avoid double deletion
+        p.getKnownOpponentLinks()[owner][label] = shared_ptr<Link>(linkPtr->get(), [](Link*){});
     }
 
-    auto loc = l->getTile()->getLocation();
-    int change = (l->getLinkType() == LinkType::DATA) ? 2 : 3;
-    notifyObserversCell(loc.first, loc.second, change);
-    notifyObserversFull();
+    // Only notify if the link is still on a tile (not downloaded)
+    if (l->getTile() != nullptr) {
+        auto loc = l->getTile()->getLocation();
+        int change = (l->getLinkType() == LinkType::DATA) ? 2 : 3;
+        notifyObserversCell(loc.first, loc.second, change);
+        notifyObserversFull();
+    }
 }
 
 vector<unique_ptr<Link>> Board::randomiseLinks(Player* p) {
