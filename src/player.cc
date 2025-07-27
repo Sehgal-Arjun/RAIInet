@@ -47,8 +47,6 @@ void Player::download(Link* l){
     else if (l->getLinkType() == LinkType::VIRUS){
         this->virusAmountDownloaded++;
     }
-    cout << "D" << to_string(dataAmountDownloaded) << endl;
-    cout << "V" << to_string(virusAmountDownloaded) << endl;
 }
 
 void Player::upload(Link* l, Tile* tile){
@@ -110,11 +108,20 @@ void Player::boostLink(Link* l, int boostAmount) {
     }
 }
 
-void Player::weakenLink(Link* l, int debuffAmount) {
-    for (auto& pair : links) {
+void Player::weakenLink(Link* l, int weakenAmount) {
+    for (auto& pair: links) {
         if (pair.second.get() == l) {
+            // store the tile that the link is currently on
+            Tile* currentTile = l->getTile();
+            
+            // release it so we can make a new one that's weakened
             auto releasedLink = pair.second.release();
-            pair.second = make_unique<WeakenedLink>(releasedLink, debuffAmount);
+            pair.second = make_unique<WeakenedLink>(releasedLink, weakenAmount);
+            
+            // update the tile's occupant to point to the new decorator
+            if (currentTile) {
+                currentTile->setOccupant(pair.second.get());
+            }
             break;
         }
     }

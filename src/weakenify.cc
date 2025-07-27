@@ -2,9 +2,11 @@
 #include "../include/link.h"
 #include "../include/player.h"
 
+using namespace std;
+
 Weakenify::Weakenify(int id): Ability("Weakenify", id) {};
 
-void Weakenify::applyAbility(Link& l) {
+void Weakenify::applyAbility(Link& l, Player& p) {
     // need to have the owner of l (yourself) replace it with a WeakenedLink!
     l.getOwner()->weakenLink(&l, 1);
 }
@@ -19,7 +21,7 @@ void Weakenify::applyAbility(Tile& t, Player& p) {
     // Empty implementation
 }
 
-void Weakenify::applyAbility(Link& l, Player& p) {
+void Weakenify::applyAbility(Link& l) {
     // Empty implementation
 }
 
