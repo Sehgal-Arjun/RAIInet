@@ -8,17 +8,21 @@ using namespace std;
 Warpify::Warpify(int id): Ability("Warpify", id) {};
 
 void Warpify::applyAbility(Link& l1, Link& l2) {
-    // we are sure that l is not owned by p, so we can Warpify it safely
-    Tile* tempTile = l1.getTile();
-    l2.getTile()->setOccupant(&l1);
-    l1.setTile(l2.getTile());
-    l1.getTile()->setOccupant(&l2);
-    l2.setTile(tempTile);
+    Tile* tile1 = l1.getTile();
+    Tile* tile2 = l2.getTile();
+
+    // Swap the tiles
+    l1.setTile(tile2);
+    l2.setTile(tile1);
+
+    // Update occupants
+    tile1->setOccupant(&l2);
+    tile2->setOccupant(&l1);
 }
 
 bool Warpify::isValidUse(Link* l1, Link* l2) const {
     // links must be distinct
-    return &l1 == &l2;
+    return !((l1->getStrength() == l2->getStrength()) && (l1->getLinkType() == l2->getLinkType()) && (l1->getOwner() == l2->getOwner()));
 }
 
 
