@@ -92,7 +92,17 @@ void Player::addAbility(Ability* a){
 void Player::boostLink(Link* l, int boostAmount) {
     for (auto& pair : links) {
         if (pair.second.get() == l) {
-            pair.second = make_unique<BoostedLink>(l, boostAmount);
+            // store the tile that the link is currently on
+            Tile* currentTile = l->getTile();
+            
+            // release it so we can make a new one that's boosted
+            auto releasedLink = pair.second.release();
+            pair.second = make_unique<BoostedLink>(releasedLink, boostAmount);
+            
+            // update the tile's occupant to point to the new decorator
+            if (currentTile) {
+                currentTile->setOccupant(pair.second.get());
+            }
             break;
         }
     }
@@ -101,7 +111,8 @@ void Player::boostLink(Link* l, int boostAmount) {
 void Player::weakenLink(Link* l, int debuffAmount) {
     for (auto& pair : links) {
         if (pair.second.get() == l) {
-            pair.second = make_unique<WeakenedLink>(l, debuffAmount);
+            auto releasedLink = pair.second.release();
+            pair.second = make_unique<WeakenedLink>(releasedLink, debuffAmount);
             break;
         }
     }
@@ -110,7 +121,8 @@ void Player::weakenLink(Link* l, int debuffAmount) {
 void Player::knightLink(Link* l) {
     for (auto& pair : links) {
         if (pair.second.get() == l) {
-            pair.second = make_unique<KnightedLink>(l);
+            auto releasedLink = pair.second.release();
+            pair.second = make_unique<KnightedLink>(releasedLink);
             break;
         }
     }
