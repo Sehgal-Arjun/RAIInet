@@ -8,8 +8,18 @@ using namespace std;
 Uploadify::Uploadify(int id): Ability("Uploadify", id) {};
 
 void Uploadify::applyAbility(Link& l, Player& p, Tile& location) {
-    // we're sure that l's owner is the caller of uploadify, so we can safely upload the Link
-    p.upload(unique_ptr<Link>(&l), &location);
+    // We need to move it from downloadedLinks and pass ownership to upload
+    string key = string(1, l.getId());
+    
+    // Get the unique_ptr from downloadedLinks
+    auto& downloadedLinks = p.getDownloadedLinks();
+    auto it = downloadedLinks.find(key);
+    if (it != downloadedLinks.end()) {
+        auto linkPtr = std::move(it->second);
+        downloadedLinks.erase(it);
+        
+        p.upload(std::move(linkPtr), &location);
+    }
 }
 
 bool Uploadify::isValidUse(Link* l, Player* p, Tile* location) const {

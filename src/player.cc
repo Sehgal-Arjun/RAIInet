@@ -27,6 +27,7 @@ void Player::assignLinks(std::vector<std::unique_ptr<Link>>&& ls){
     for (auto& link: ls){
         link->setId(key);
         this->links[string(1, key)] = std::move(link);
+        this->originalLinks[string(1, key)] = this->links[string(1, key)].get();
         key++;
     }
 }
@@ -41,16 +42,6 @@ unique_ptr<Link> Player::download(Link* l){
         l->setTile(nullptr);
     }
 
-    // increment data/virusAmountDownloaded
-    if (l->getLinkType() == LinkType::DATA) {
-        this->dataAmountDownloaded++;
-    }
-    else if (l->getLinkType() == LinkType::VIRUS){
-        this->virusAmountDownloaded++;
-    }
-
-    // set the link's owner as this player (so we can upload it with uploadify)
-    l->setOwner(this);
 
     // remove the link from the player's vector of links and return it
     string key = string(1, l->getId());
@@ -77,8 +68,8 @@ void Player::upload(unique_ptr<Link> l, Tile* tile){
     // make sure the tile knows it has an occupant
     tile->setOccupant(l.get());
 
-    // add the link to the player's vector of links
-    links[string(1, l->getId())] = move(l);
+    // add the link to the player's active links map (move from downloaded to active)
+    links[string(1, l->getId())] = std::move(l);
 }
 
 void Player::printAbilities(ostream& out) {
@@ -100,6 +91,19 @@ Ability* Player::getAbility(int id) const {
 
 void Player::addAbility(Ability* a){
     this->chosenAbilities.push_back(unique_ptr<Ability>(a));
+}
+
+void Player::storeDownloadedLink(unique_ptr<Link> l) {
+    string key = string(1, l->getId());
+    downloadedLinks[key] = std::move(l);
+}
+
+void Player::incrementDataDownloaded() {
+    this->dataAmountDownloaded++;
+}
+
+void Player::incrementVirusDownloaded() {
+    this->virusAmountDownloaded++;
 }
 
 void Player::boostLink(Link* l, int boostAmount) {
@@ -174,17 +178,35 @@ int Player::getPlayerId() const{ return playerId; }
 
 map<string, unique_ptr<Link>>& Player::getLinks() { return links; }
 
+map<string, unique_ptr<Link>>& Player::getDownloadedLinks() { return downloadedLinks; }
+
 Link* Player::getLink(char link) {
     if (!((link >= 'a' && link <= 'h') || (link >= 'A' && link <= 'H'))) {
         return nullptr;
     }
     string key = string(1, link);
+    
+    // First check active links
     auto it = this->links.find(key);
-    return (it != this->links.end()) ? it->second.get() : nullptr;
+    if (it != this->links.end()) {
+        return it->second.get();
+    }
+    
+    // Then check downloaded links
+    auto downloadedIt = this->downloadedLinks.find(key);
+    if (downloadedIt != this->downloadedLinks.end()) {
+        return downloadedIt->second.get();
+    }
+    
+    return nullptr;
 }
 
 map<Player*, map<string, Link*>>& Player::getKnownOpponentLinks() {
     return knownOpponentLinks;
+}
+
+map<string, Link*>& Player::getOriginalLinks() {
+    return originalLinks;
 }
 
 int Player::getDataAmountDownloaded(){ return dataAmountDownloaded; }

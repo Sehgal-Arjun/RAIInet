@@ -37,11 +37,11 @@ void TextDisplay::print(ostream& out) {
     
     // Show Player 1's links from the current perspective
     if (pov == p1) {
-        // If viewing from Player 1's perspective, show all their links
+        // If viewing from Player 1's perspective, show all their original links (even if downloaded)
         for (int i = 0; i < 8; ++i) {
             char k = 'a' + i;
-            auto it = p1->getLinks().find(string(1, k));
-            if (it != p1->getLinks().end()) {
+            auto it = p1->getOriginalLinks().find(string(1, k));
+            if (it != p1->getOriginalLinks().end()) {
                 if (it->second) {
                     out << k << ": " << it->second->makeString();
                 } else {
@@ -126,11 +126,11 @@ void TextDisplay::print(ostream& out) {
     
     // Show Player 2's links from the current perspective
     if (pov == p2) {
-        // If viewing from Player 2's perspective, show all their links
+        // If viewing from Player 2's perspective, show all their original links (even if downloaded)
         for (int i = 0; i < 8; ++i) {
             char k = 'A' + i;
-            auto it = p2->getLinks().find(string(1, k));
-            if (it != p2->getLinks().end()) {
+            auto it = p2->getOriginalLinks().find(string(1, k));
+            if (it != p2->getOriginalLinks().end()) {
                 if (it->second) {
                     out << k << ": " << it->second->makeString();
                 } else {

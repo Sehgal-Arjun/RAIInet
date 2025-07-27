@@ -362,17 +362,15 @@ void Controller::addView(View* v) {
 }
 
 Link* Controller::getLink(char name){
-    if ('a' <= name && name <= 'h') {
-        // if it's player 1's link
-        return players.at(0)->getLink(name);
+    // Search both players for the link
+    for (auto player : players) {
+        Link* link = player->getLink(name);
+        if (link != nullptr) {
+            return link;
+        }
     }
-    else if ('A' <= name && name <= 'H') {
-        // if it's player 2's link
-        return players.at(1)->getLink(name);
-    }
-    else {
-        return nullptr;
-    }
+    
+    return nullptr;
 }
 
 bool Controller::executeCommand(string input){    
