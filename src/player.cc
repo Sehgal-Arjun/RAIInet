@@ -35,8 +35,10 @@ void Player::download(Link* l){
     l->setInUse(false);
     
     // 2. indicate that the Link isn't on a Tile
-    l->getTile()->setOccupant(nullptr);
-    l->setTile(nullptr);
+    if (l->getTile() != nullptr) {
+        l->getTile()->setOccupant(nullptr);
+        l->setTile(nullptr);
+    }
 
     // 3. increment data/virusAmountDownloaded
     if (l->getLinkType() == LinkType::DATA) {
@@ -139,11 +141,11 @@ void Player::knightLink(Link* l) {
 
 void Player::reveal(Link* l){
     if (l->getOwner() != this){ // make sure we're not adding to the map if it's your own link
-        if (l->getLinkType() == LinkType::DATA){
-            knownOpponentLinks[l->getOwner()]["D" + to_string(l->getStrength())] = shared_ptr<Link>(l);
-        }
-        else if (l->getLinkType() == LinkType::VIRUS){
-            knownOpponentLinks[l->getOwner()]["V" + to_string(l->getStrength())] = shared_ptr<Link>(l);
+        for (const auto& pair : l->getOwner()->getLinks()) {
+            if (pair.second.get() == l) {
+                knownOpponentLinks[l->getOwner()][pair.first] = shared_ptr<Link>(pair.second.get(), [](Link*){});
+                break;
+            }
         }
     }
 }

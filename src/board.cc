@@ -87,11 +87,9 @@ void Board::reveal(Link* l, Player& p) {
     }
 
     if (!label.empty() && linkPtr) {
-        // Use a non-owning shared_ptr to avoid double deletion
         p.getKnownOpponentLinks()[owner][label] = shared_ptr<Link>(linkPtr->get(), [](Link*){});
     }
 
-    // Only notify if the link is still on a tile (not downloaded)
     if (l->getTile() != nullptr) {
         auto loc = l->getTile()->getLocation();
         int change = (l->getLinkType() == LinkType::DATA) ? 2 : 3;
