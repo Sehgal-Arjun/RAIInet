@@ -12,7 +12,7 @@
 
 using namespace std;
 
-void Board::initialiseBoard(istream& in, vector<Player*> players) {
+void Board::initialise(vector<Player*> players) {
     height = 8;
     width = 8;
     grid.clear();
@@ -37,11 +37,9 @@ void Board::initialiseBoard(istream& in, vector<Player*> players) {
     grid.at(height - 1).at(width / 2)->setServerPortOwner(players.at(1));
     grid.at(height - 1).at(width / 2 - 1)->enableServerPort();    
     grid.at(height - 1).at(width / 2 - 1)->setServerPortOwner(players.at(1));
+}
 
-    // for now, only supporting randomised link order
-    vector<unique_ptr<Link>> linksP1 = randomiseLinks( players.at(0));
-    vector<unique_ptr<Link>> linksP2 = randomiseLinks( players.at(1));
-
+void Board::placeLinkVectors(vector<unique_ptr<Link>>& linksP1, vector<unique_ptr<Link>>& linksP2, vector<Player*> players) {
     for (int i = 0; i < grid.at(0).size(); i++){
         int row = 0;
         if (grid.at(0).at(i)->isServerPortTile()){
@@ -62,6 +60,36 @@ void Board::initialiseBoard(istream& in, vector<Player*> players) {
 
     players.at(0)->assignLinks(std::move(linksP1));
     players.at(1)->assignLinks(std::move(linksP2));
+}
+
+void Board::initialiseBoard(istream& in, vector<Player*> players) {
+    initialise(players);
+
+    // for now, only supporting randomised link order
+    vector<unique_ptr<Link>> linksP1 = randomiseLinks(players.at(0));
+    vector<unique_ptr<Link>> linksP2 = randomiseLinks(players.at(1));
+
+    placeLinkVectors(linksP1, linksP2, players);
+}
+
+void Board::initialiseBoard(istream& in, vector<Player*> players, const vector<string>& link1Order, const vector<string>& link2Order) {
+    initialise(players);
+
+    vector<unique_ptr<Link>> linksP1, linksP2;
+    
+    if (link1Order.empty()) {
+        linksP1 = randomiseLinks(players.at(0));
+    } else {
+        linksP1 = createLinksFromOrder(players.at(0), link1Order);
+    }
+    
+    if (link2Order.empty()) {
+        linksP2 = randomiseLinks(players.at(1));
+    } else {
+        linksP2 = createLinksFromOrder(players.at(1), link2Order);
+    }
+
+    placeLinkVectors(linksP1, linksP2, players);
 }
 
 void Board::placeLink(Link& l, Tile* t) {
@@ -118,6 +146,31 @@ vector<unique_ptr<Link>> Board::randomiseLinks(Player* p) {
         randomisedOrder[linkNums[i]] = make_unique<BasicLink>(strength, isData, getTileAt(y, i), p);
     }
     return randomisedOrder;
+}
+
+vector<unique_ptr<Link>> Board::createLinksFromOrder(Player* p, const vector<string>& linkOrder) {
+    vector<unique_ptr<Link>> orderedLinks(8);
+    
+    int y = (p->getPlayerId() == 2) ? height - 1 : 0;
+    
+    for (int i = 0; i < 8; i++) {
+        string linkSpec = linkOrder[i];
+        if (linkSpec.length() != 2) {
+            throw invalid_argument("Invalid link specification: " + linkSpec);
+        }
+        
+        char type = linkSpec[0];
+        int strength = linkSpec[1] - '0';
+        
+        if ((type != 'V' && type != 'D') || strength < 1 || strength > 4) {
+            throw invalid_argument("Invalid link specification: " + linkSpec);
+        }
+        
+        bool isData = (type == 'D');
+        orderedLinks[i] = make_unique<BasicLink>(strength, isData, getTileAt(y, i), p);
+    }
+    
+    return orderedLinks;
 }
 
 Tile* Board::getTileAt(int row, int col) const {
