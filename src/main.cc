@@ -10,6 +10,9 @@
 #include "../include/scan.h"
 #include "../include/polarise.h"
 #include "../include/knightify.h"
+#include "../include/warpify.h"
+#include "../include/uploadify.h"
+#include "../include/weakenify.h"
 
 #include <vector>
 #include <memory>
@@ -19,6 +22,46 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
+    // Default ability orders (LinkBoost, Firewall, Download, Scan, Polarize)
+    string ability1Order = "LFDSP";
+    string ability2Order = "LFDSP";
+    bool useGraphics = false;
+
+    // Parse command line arguments
+    for (int i = 1; i < argc; ++i) {
+        if (strcmp(argv[i], "-graphics") == 0) {
+            useGraphics = true;
+        }
+        else if (strcmp(argv[i], "-ability1") == 0) {
+            if (i + 1 < argc) {
+                ability1Order = argv[i + 1];
+                ++i; // Skip the next argument since we used it
+            } else {
+                cerr << "Error: -ability1 requires an ability order string" << endl;
+                return 1;
+            }
+        }
+        else if (strcmp(argv[i], "-ability2") == 0) {
+            if (i + 1 < argc) {
+                ability2Order = argv[i + 1];
+                ++i; // Skip the next argument since we used it
+            } else {
+                cerr << "Error: -ability2 requires an ability order string" << endl;
+                return 1;
+            }
+        }
+    }
+
+    // Validate ability orders
+    if (ability1Order.length() != 5) {
+        cerr << "Error: Player 1 ability order must contain exactly 5 characters" << endl;
+        return 1;
+    }
+    if (ability2Order.length() != 5) {
+        cerr << "Error: Player 2 ability order must contain exactly 5 characters" << endl;
+        return 1;
+    }
+
     // Create players
     unique_ptr<Player> p1(new Player(1));
     unique_ptr<Player> p2(new Player(2));
@@ -32,26 +75,46 @@ int main(int argc, char* argv[]) {
     Controller controller(std::move(board));
     controller.setPlayers(players);
 
-    // Check for -graphics argument
-    bool useGraphics = false;
-    for (int i = 1; i < argc; ++i) {
-        if (strcmp(argv[i], "-graphics") == 0) {
-            useGraphics = true;
-            break;
+    // Add abilities to player 1 based on ability1Order
+    for (int i = 0; i < 5; ++i) {
+        char c = ability1Order[i];
+        Ability* ability = nullptr;
+        switch (c) {
+            case 'L': ability = new LinkBoost(i); break;
+            case 'F': ability = new Firewall(i); break;
+            case 'D': ability = new Download(i); break;
+            case 'S': ability = new Scan(i); break;
+            case 'P': ability = new Polarise(i); break;
+            case 'K': ability = new Knightify(i); break;
+            case 'W': ability = new Weakenify(i); break;
+            case 'U': ability = new Uploadify(i); break;
+            case 'T': ability = new Warpify(i); break;
+            default:
+                cerr << "Error: Unknown ability character '" << c << "'" << endl;
+                return 1;
         }
+        p1->addAbility(ability);
     }
 
-    p1->addAbility(new Download(0));
-    p1->addAbility(new Scan(1));
-    p1->addAbility(new Polarise(2));
-    p1->addAbility(new LinkBoost(3));
-    p1->addAbility(new Firewall(4));
-
-    p2->addAbility(new Download(0));
-    p2->addAbility(new Scan(1));
-    p2->addAbility(new Polarise(2));
-    p2->addAbility(new LinkBoost(3));
-    p2->addAbility(new Firewall(4));
+    for (int i = 0; i < 5; ++i) {
+        char c = ability2Order[i];
+        Ability* ability = nullptr;
+        switch (c) {
+            case 'L': ability = new LinkBoost(i); break;
+            case 'F': ability = new Firewall(i); break;
+            case 'D': ability = new Download(i); break;
+            case 'S': ability = new Scan(i); break;
+            case 'P': ability = new Polarise(i); break;
+            case 'K': ability = new Knightify(i); break;
+            case 'W': ability = new Weakenify(i); break;
+            case 'U': ability = new Uploadify(i); break;
+            case 'T': ability = new Warpify(i); break;
+            default:
+                cerr << "Error: Unknown ability character '" << c << "'" << endl;
+                return 1;
+        }
+        p2->addAbility(ability);
+    }
 
     // Create displays for each player perspective
     TextDisplay* textDisplay1 = new TextDisplay(controller.getBoard(), &players, p1.get(), &controller);
