@@ -1,118 +1,188 @@
 #include "../include/graphicdisplay.h"
+#include "../include/basiclink.h"
 #include <iostream>
 #include <string>
 
 using namespace std;
 
 GraphicDisplay::GraphicDisplay(Board* b, vector<Player*>* ps, Player* persp, int n)
-    : xw(500, 500), gridSize{n}, cellSize{500 / n}, board(b), players(ps), perspective(persp) {}
+    : xw(500, 750), gridSize{n}, cellSize{50}, board(b), players(ps), perspective(persp) {}
 
 GraphicDisplay::~GraphicDisplay() {}
 
-// This notify should be called with enough info to update the cell
-void GraphicDisplay::notifyCell(int row, int col, int change) {
-    // change encoding:
-    // 0: empty
-    // 1: unknown link
-    // 2: data (revealed)
-    // 3: virus (revealed)
-    // 4: firewall (player 1)
-    // 5: firewall (player 2)
-    // 6: server port
-    // 7+: other features (extend as needed)
+void GraphicDisplay::clearWindow() {
+    xw.fillRectangle(0, 0, 500, 750, Xwindow::White);
+}
 
-    int colour = Xwindow::Black;
-    string cellText = "";
-
-    switch (change) {
-        case 0: // Empty
-            colour = Xwindow::White;
-            break;
-        case 1: // Unknown link
-            colour = Xwindow::Black;
-            cellText = "?";
-            break;
-        case 2: // Data (revealed)
-            colour = Xwindow::Green;
-            cellText = "D"; // Or show strength/letter if available
-            break;
-        case 3: // Virus (revealed)
-            colour = Xwindow::Red;
-            cellText = "V"; // Or show strength/letter if available
-            break;
-        case 4: // Firewall (player 1)
-            colour = Xwindow::Blue;
-            cellText = "m";
-            break;
-        case 5: // Firewall (player 2)
-            colour = Xwindow::Red;
-            cellText = "w";
-            break;
-        case 6: // Server port
-            colour = Xwindow::White;
-            cellText = "S";
-            break;
-        default:
-            colour = Xwindow::Black;
-            break;
+void GraphicDisplay::drawPlayerInfo(Player* player, int yOffset) {
+    int xOffset = 10;
+    
+    // Player title
+    xw.drawString(xOffset, yOffset, "Player " + to_string(player->getPlayerId()) + ":");
+    yOffset += 20;
+    
+    // Downloaded counts
+    xw.drawString(xOffset, yOffset, "Downloaded: " + to_string(player->getDataAmountDownloaded()) + "D, " + to_string(player->getVirusAmountDownloaded()) + "V");
+    yOffset += 20;
+    
+    // Abilities count
+    int abilitiesCount = 0;
+    for (const auto& ability : player->getAbilities()) {
+        if (!ability->isUsed()) abilitiesCount++;
     }
-
-    int x = col * cellSize;
-    int y = row * cellSize;
-    xw.fillRectangle(x, y, cellSize, cellSize, colour);
-
-    // Draw text if needed (centered)
-    if (!cellText.empty()) {
-        int textX = x + cellSize / 2 - 8; // Adjust for centering
-        int textY = y + cellSize / 2 + 8;
-        xw.drawString(textX, textY, cellText);
+    xw.drawString(xOffset, yOffset, "Abilities: " + to_string(abilitiesCount));
+    yOffset += 20;
+    
+    // Player's links - show details if this is the current perspective, otherwise show as known opponent links
+    char linkID = (player->getPlayerId() == 1) ? 'a' : 'A';
+    
+    if (player == perspective) {
+        // This is the current player's perspective - show their original links
+        for (int i = 0; i < 8; ++i) {
+            string linkKey(1, linkID);
+            auto& originalLinks = player->getOriginalLinks();
+            auto it = originalLinks.find(linkKey);
+            
+            string linkInfo;
+            if (it != originalLinks.end() && it->second) {
+                linkInfo = linkKey + ": " + it->second->makeString();
+            } else {
+                linkInfo = linkKey + ": ?";
+            }
+            
+            if (i % 4 == 0 && i > 0) {
+                yOffset += 20;
+                xOffset = 10;
+            }
+            
+            xw.drawString(xOffset, yOffset, linkInfo);
+            xOffset += 60;
+            linkID++;
+        }
+    } 
+    else {
+        // This is the opponent from current perspective - show only known links
+        auto known = perspective->getKnownOpponentLinks().find(player);
+        
+        for (int i = 0; i < 8; ++i) {
+            string linkKey(1, linkID);
+            string linkInfo;
+            
+            if (known != perspective->getKnownOpponentLinks().end()) {
+                auto it = known->second.find(linkKey);
+                if (it != known->second.end() && it->second) {
+                    linkInfo = linkKey + ": " + it->second->makeString();
+                } else {
+                    linkInfo = linkKey + ": ?";
+                }
+            } 
+            else {
+                linkInfo = linkKey + ": ?";
+            }
+            
+            if (i % 4 == 0 && i > 0) {
+                yOffset += 20;
+                xOffset = 10;
+            }
+            
+            xw.drawString(xOffset, yOffset, linkInfo);
+            xOffset += 60;
+            linkID++;
+        }
     }
 }
 
-void GraphicDisplay::notifyFull() {
-    // Optionally redraw the whole board or print a summary
-    print(cout);
-}
-
-void GraphicDisplay::print(ostream &out) {
-    Player* p1 = (*players)[0];
-    Player* p2 = (*players)[1];
-    Player* pov = perspective;
-    Player* opp = (pov == p1) ? p2 : p1;
-    int height = board->getHeight();
-    int width = board->getWidth();
-    for (int r = 0; r < height; ++r) {
-        for (int c = 0; c < width; ++c) {
-            Tile* t = board->getTileAt(r, c);
+void GraphicDisplay::drawBoard() {
+    int boardStartY = 150;
+    int boardStartX = 50;
+    
+    for (int r = 0; r < gridSize; ++r) {
+        for (int c = 0; c < gridSize; ++c) {
+            Tile* tile = board->getTileAt(r, c);
             int colour = Xwindow::White;
-            string cellText = "";
-            if (t->isServerPortTile()) {
-                colour = Xwindow::White;
+            string cellText = ".";
+            
+            if (tile->isServerPortTile()) {
+                colour = Xwindow::Blue;
                 cellText = "S";
-            } else if (t->isFirewallTile()) {
-                colour = (t->getFirewallOwner() == p1) ? Xwindow::Blue : Xwindow::Red;
-                cellText = (t->getFirewallOwner() == p1) ? "m" : "w";
-            } else if (t->getOccupant()) {
-                Link* occ = t->getOccupant();
+            } 
+            else if (tile->isFirewallTile()) {
+                if (tile->getOccupant() == nullptr) {
+                    colour = (tile->getFirewallOwner() == (*players)[0]) ? Xwindow::Blue : Xwindow::Red;
+                    cellText = (tile->getFirewallOwner() == (*players)[0]) ? "m" : "w";
+                } 
+                else {
+                    // Firewall tile with occupant - treat as regular occupant
+                    Link* occ = tile->getOccupant();
+                    Player* owner = occ->getOwner();
+                    
+                    if (owner == perspective) {
+                        // Own link - show actual character
+                        for (const auto& pair : perspective->getLinks()) {
+                            if (pair.second.get() == occ) {
+                                cellText = pair.first;
+                                colour = (occ->getLinkType() == LinkType::DATA) ? Xwindow::Green : Xwindow::Red;
+                                break;
+                            }
+                        }
+                        // Also check downloaded links
+                        for (const auto& pair : perspective->getDownloadedLinks()) {
+                            if (pair.second.get() == occ) {
+                                cellText = pair.first;
+                                colour = (occ->getLinkType() == LinkType::DATA) ? Xwindow::Green : Xwindow::Red;
+                                break;
+                            }
+                        }
+                    } else {
+                        // Opponent's link - check if revealed
+                        auto known = perspective->getKnownOpponentLinks().find(owner);
+                        bool revealed = false;
+                        if (known != perspective->getKnownOpponentLinks().end()) {
+                            for (const auto& pair : known->second) {
+                                if (pair.second == occ) {
+                                    cellText = pair.first;
+                                    colour = (occ->getLinkType() == LinkType::DATA) ? Xwindow::Green : Xwindow::Red;
+                                    revealed = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!revealed) {
+                            cellText = "?";
+                            colour = Xwindow::Black;
+                        }
+                    }
+                }
+            } else if (tile->getOccupant()) {
+                Link* occ = tile->getOccupant();
                 Player* owner = occ->getOwner();
-                if (owner == pov) {
-                    // Find letter for this link
-                    for (const auto& pair : pov->getLinks()) {
+                
+                if (owner == perspective) {
+                    // Own link - show actual character
+                    for (const auto& pair : perspective->getLinks()) {
                         if (pair.second.get() == occ) {
                             cellText = pair.first;
-                            colour = Xwindow::Black;
+                            colour = (occ->getLinkType() == LinkType::DATA) ? Xwindow::Green : Xwindow::Red;
+                            break;
+                        }
+                    }
+                    // Also check downloaded links
+                    for (const auto& pair : perspective->getDownloadedLinks()) {
+                        if (pair.second.get() == occ) {
+                            cellText = pair.first;
+                            colour = (occ->getLinkType() == LinkType::DATA) ? Xwindow::Green : Xwindow::Red;
                             break;
                         }
                     }
                 } else {
-                    // Is this link revealed?
-                    auto known = pov->getKnownOpponentLinks().find(owner);
+                    // Opponent's link - check if revealed
+                    auto known = perspective->getKnownOpponentLinks().find(owner);
                     bool revealed = false;
-                    if (known != pov->getKnownOpponentLinks().end()) {
+                    if (known != perspective->getKnownOpponentLinks().end()) {
                         for (const auto& pair : known->second) {
                             if (pair.second == occ) {
                                 cellText = pair.first;
-                                colour = Xwindow::Black;
+                                colour = (occ->getLinkType() == LinkType::DATA) ? Xwindow::Green : Xwindow::Red;
                                 revealed = true;
                                 break;
                             }
@@ -124,14 +194,67 @@ void GraphicDisplay::print(ostream &out) {
                     }
                 }
             }
-            int x = c * cellSize;
-            int y = r * cellSize;
+            
+            int x = boardStartX + (c * cellSize);
+            int y = boardStartY + (r * cellSize);
+            
             xw.fillRectangle(x, y, cellSize, cellSize, colour);
-            if (!cellText.empty()) {
-                int textX = x + cellSize / 2 - 8;
-                int textY = y + cellSize / 2 + 8;
-                xw.drawString(textX, textY, cellText);
-            }
+            
+            // Draw border
+            xw.fillRectangle(x, y, cellSize, 1, Xwindow::Black);
+            xw.fillRectangle(x, y, 1, cellSize, Xwindow::Black);
+            xw.fillRectangle(x + cellSize - 1, y, 1, cellSize, Xwindow::Black);
+            xw.fillRectangle(x, y + cellSize - 1, cellSize, 1, Xwindow::Black);
+            
+            // Draw text centered
+            int textX = x + cellSize / 2 - 4;
+            int textY = y + cellSize / 2 + 4;
+            xw.drawString(textX, textY, cellText);
         }
     }
+}
+
+void GraphicDisplay::notifyCell(int row, int col, int change) {
+    // Update the display when notified of a cell change
+    print(cout);
+}
+
+void GraphicDisplay::notifyFull() {
+    // Redraw the entire display
+    print(cout);
+}
+
+void GraphicDisplay::print(ostream &out) {
+    // Clear the window
+    clearWindow();
+    
+    Player* player1 = nullptr;
+    Player* player2 = nullptr;
+    
+    // Find Player 1 and Player 2
+    for (Player* p : *players) {
+        if (p->getPlayerId() == 1) {
+            player1 = p;
+        } 
+        else if (p->getPlayerId() == 2) {
+            player2 = p;
+        }
+    }
+    
+    if (!player1 || !player2) return; // Safety check
+    
+    // Always draw Player 1 info at top (but visibility depends on perspective)
+    drawPlayerInfo(player1, 20);
+    
+    // Draw the board in the middle
+    drawBoard();
+    
+    // Always draw Player 2 info at bottom (but visibility depends on perspective)
+    drawPlayerInfo(player2, 600);
+}
+
+void GraphicDisplay::setPerspective(Player* newPerspective) {
+    perspective = newPerspective;
+    // Immediately refresh the display with the new perspective
+    print(cout);
 }
