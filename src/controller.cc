@@ -438,10 +438,10 @@ bool Controller::executeCommand(string input){
                     }
                 }
                 
-                else if (ability->getName() == "Firewall" ) {    
+                else if (ability->getName() == "Firewall" ) {   
                     // next should be the tile, so should be 0-7, and need another char 0-7
-                    char x = next[0];
-                    char y;
+                    int x = stoi(next);
+                    int y;
                     stream >> y;
                     if (x <= 7 && x >= 0 && y <= 7 && y >= 0){
                         useAbility(*ability, *currentTurn, *board->getTileAt(x, y));

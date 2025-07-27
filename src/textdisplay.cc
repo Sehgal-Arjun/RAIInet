@@ -85,7 +85,19 @@ void TextDisplay::print(ostream& out) {
                 symbol = 'S';
             } 
             else if (t->isFirewallTile()) {
-                symbol = (t->getFirewallOwner() == p1 ? 'm' : 'w');
+                if (t->getOccupant() == nullptr){
+                    symbol = (t->getFirewallOwner() == p1 ? 'm' : 'w');
+                }
+                else {
+                    Link* occ = t->getOccupant();
+                    // Find letter for this link
+                    for (const auto& pair : occ->getOwner()->getLinks()) {
+                        if (pair.second.get() == occ) {
+                            symbol = pair.first[0];
+                            break;
+                        }
+                    }
+                }
             } 
             else if (t->getOccupant()) {
                 Link* occ = t->getOccupant();
