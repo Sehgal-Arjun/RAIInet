@@ -183,13 +183,12 @@ int main(int argc, char* argv[]) {
     controller.addView(textDisplay1.get());
     controller.addView(textDisplay2.get());
 
-    unique_ptr<GraphicDisplay> graphicDisplay1, graphicDisplay2;
+    unique_ptr<GraphicDisplay> graphicDisplay;
     if (useGraphics) {
         cout << "Graphics enabled." << endl;
-        graphicDisplay1 = make_unique<GraphicDisplay>(controller.getBoard(), &players, p1.get(), 8);
-        graphicDisplay2 = make_unique<GraphicDisplay>(controller.getBoard(), &players, p2.get(), 8);
-        controller.addView(graphicDisplay1.get());
-        controller.addView(graphicDisplay2.get());
+        graphicDisplay = make_unique<GraphicDisplay>(controller.getBoard(), &players, p1.get(), 8);
+        controller.addView(graphicDisplay.get());
+        controller.setGraphicDisplay(graphicDisplay.get());  // Give controller access to switch perspectives
     }
 
     // Start the game

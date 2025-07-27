@@ -10,24 +10,28 @@
 #include "ability.h"
 #include "view.h"
 
+class GraphicDisplay;  // Forward declaration
+
 class Controller {
     std::unique_ptr<Board> board;
     std::vector<Player*> players;
     bool useGraphics;
     Player* currentTurn;
     std::vector<View*> views;
+    GraphicDisplay* graphicDisplay;  // Pointer to the single graphic display
     std::pair<int, int> calculateMove(Link* l, std::string direction);
     std::pair<int, int> calculateMove(Link* l, std::string direction1, std::string direction2);
     Link* getLink(char name);
 
     public:
-        Controller() : board(std::make_unique<Board>()) {}
-        Controller(std::unique_ptr<Board> b) : board(std::move(b)) {}
+        Controller() : board(std::make_unique<Board>()), graphicDisplay(nullptr) {}
+        Controller(std::unique_ptr<Board> b) : board(std::move(b)), graphicDisplay(nullptr) {}
         ~Controller() {}
 
         void setPlayers(const std::vector<Player*>& ps);
 
         void addView(View* v);
+        void setGraphicDisplay(GraphicDisplay* gd);  // Set the graphic display pointer
         
         Board* getBoard() const { return board.get(); }
         

@@ -16,13 +16,17 @@ class GraphicDisplay : public View {
     Player* perspective;
 
 public:
-    // change encoding:
-    // 0: empty, 1: unknown, 2: data, 3: virus, 4: firewall (p1), 5: firewall (p2), 6: server port
     GraphicDisplay(Board* b, std::vector<Player*>* ps, Player* persp, int n);
     ~GraphicDisplay();
     void notifyCell(int row, int col, int change) override;
     void notifyFull() override;
     void print(std::ostream &out) override;
+    void setPerspective(Player* newPerspective);  // Add method to change perspective
+    
+private:
+    void drawPlayerInfo(Player* player, int yOffset);
+    void drawBoard();
+    void clearWindow();
 };
 
 #endif 

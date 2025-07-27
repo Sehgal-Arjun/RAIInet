@@ -1,5 +1,6 @@
 #include "../include/controller.h"
 #include "../include/basiclink.h"
+#include "../include/graphicdisplay.h"
 
 #include <iostream>
 #include <memory>
@@ -101,17 +102,28 @@ void Controller::move(pair<int, int> location, Link& l, Player& p) {
             return;
         }
     }
-    
-    // if moving onto a server port (and we know it'll be an opponent's server tile)
-    else if (destination->isServerPortTile()) {
-        destination->getServerPortOwner()->download(&l);
-        return;
-    }
 
     // move the tile
     l.getTile()->setOccupant(nullptr);
     l.setTile(destination);
     destination->setOccupant(&l);
+    
+    // After moving, check if we're on an opponent's server port
+    if (destination->isServerPortTile() && destination->getServerPortOwner() != &p) {
+        Player* serverOwner = destination->getServerPortOwner();
+        auto downloadedLink = l.getOwner()->download(&l);
+        
+        // Update download counters for the server owner
+        if (l.getLinkType() == LinkType::DATA) {
+            serverOwner->incrementDataDownloaded();
+        } else if (l.getLinkType() == LinkType::VIRUS) {
+            serverOwner->incrementVirusDownloaded();
+        }
+        
+        // Store the downloaded link in the server owner's collection
+        serverOwner->storeDownloadedLink(std::move(downloadedLink));
+        return;
+    }
 
     // Don't notify observers here - will be done after turn switch
 }
@@ -231,15 +243,48 @@ Link& Controller::battle(Link& initiator, Link& victim, Tile& battleTile, Tile& 
     }
 
     if (initiator.getStrength() == victim.getStrength()){ // links are same strength, initator wins
-        initiator.getOwner()->download(&victim);
+        Player* winner = initiator.getOwner();
+        auto downloadedLink = victim.getOwner()->download(&victim);
+        
+        // Update download counters for the winner
+        if (victim.getLinkType() == LinkType::DATA) {
+            winner->incrementDataDownloaded();
+        } else if (victim.getLinkType() == LinkType::VIRUS) {
+            winner->incrementVirusDownloaded();
+        }
+        
+        // Store the downloaded link in the winner's collection
+        winner->storeDownloadedLink(std::move(downloadedLink));
         return initiator;
     }
     else if (initiator.getStrength() > victim.getStrength()){
-        initiator.getOwner()->download(&victim);
+        Player* winner = initiator.getOwner();
+        auto downloadedLink = victim.getOwner()->download(&victim);
+        
+        // Update download counters for the winner
+        if (victim.getLinkType() == LinkType::DATA) {
+            winner->incrementDataDownloaded();
+        } else if (victim.getLinkType() == LinkType::VIRUS) {
+            winner->incrementVirusDownloaded();
+        }
+        
+        // Store the downloaded link in the winner's collection
+        winner->storeDownloadedLink(std::move(downloadedLink));
         return initiator;
     }
     else{
-        victim.getOwner()->download(&initiator);
+        Player* winner = victim.getOwner();
+        auto downloadedLink = initiator.getOwner()->download(&initiator);
+        
+        // Update download counters for the winner
+        if (initiator.getLinkType() == LinkType::DATA) {
+            winner->incrementDataDownloaded();
+        } else if (initiator.getLinkType() == LinkType::VIRUS) {
+            winner->incrementVirusDownloaded();
+        }
+        
+        // Store the downloaded link in the winner's collection
+        winner->storeDownloadedLink(std::move(downloadedLink));
         return victim;
     }
 }
@@ -258,6 +303,10 @@ void Controller::useAbility(Ability& a, Player& p, Link& l) {
     if (a.isValidUse(&l, &p)){
         a.applyAbility(l, p);
         a.setUsed(true);
+        // Abilities don't trigger board notifications, so manually update graphics
+        if (graphicDisplay) {
+            graphicDisplay->print(cout);
+        }
     }
     else {
         cout << "INVALID ABILITY: " << a.getName() << endl;
@@ -269,6 +318,9 @@ void Controller::useAbility(Ability& a, Player& p, Tile& t) {
     if (a.isValidUse(&t)){
         a.applyAbility(t, p);
         a.setUsed(true);
+        if (graphicDisplay) {
+            graphicDisplay->print(cout);
+        }
     }
     else{
         cout << "INVALID ABILITY: " << a.getName() << endl;
@@ -280,6 +332,9 @@ void Controller::useAbility(Ability& a, Link& l){
     if (a.isValidUse(&l)){
         a.applyAbility(l);
         a.setUsed(true);
+        if (graphicDisplay) {
+            graphicDisplay->print(cout);
+        }
     }
     else{
         cout << "INVALID ABILITY: " << a.getName() << endl;
@@ -291,6 +346,9 @@ void Controller::useAbility(Ability& a, Link& l1, Link& l2){
     if (a.isValidUse(&l1, &l2)){
         a.applyAbility(l1, l2);
         a.setUsed(true);
+        if (graphicDisplay) {
+            graphicDisplay->print(cout);
+        }
     }
     else{
         cout << "INVALID ABILITY: " << a.getName() << endl;
@@ -302,6 +360,9 @@ void Controller::useAbility(Ability& a, Player& p, Link& l, Tile& t){
     if (a.isValidUse(&l, &p, &t)){
         a.applyAbility(l, p, t);
         a.setUsed(true);
+        if (graphicDisplay) {
+            graphicDisplay->print(cout);
+        }
     }
     else{
         cout << "INVALID ABILITY: " << a.getName() << endl;
@@ -354,11 +415,20 @@ void Controller::switchTurn() {
             }
         }
     }
+    
+    // Update graphics perspective if graphics are enabled
+    if (graphicDisplay) {
+        graphicDisplay->setPerspective(currentTurn);
+    }
 }
 
 void Controller::addView(View* v) {
     views.push_back(v);
     board->attach(v);
+}
+
+void Controller::setGraphicDisplay(GraphicDisplay* gd) {
+    graphicDisplay = gd;
 }
 
 Link* Controller::getLink(char name){
@@ -499,6 +569,9 @@ bool Controller::executeCommand(string input){
 
     else if (cmd == "board"){
         views.at(currentTurn->getPlayerId() - 1)->print(cout);
+        if (graphicDisplay) {
+            graphicDisplay->print(cout);
+        }
     }
 
     else if (cmd == "sequence") {
