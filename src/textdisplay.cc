@@ -6,7 +6,7 @@
 
 using namespace std;
 
-TextDisplay::TextDisplay(Board* b, std::vector<Player*>* ps, Player* persp, Controller* ctrl)
+TextDisplay::TextDisplay(Board* b, vector<Player*>* ps, Player* persp, Controller* ctrl)
     : board(b), players(ps), perspective(persp), controller(ctrl) {}
 
 void TextDisplay::notifyCell(int r, int c, int change) {
@@ -16,7 +16,7 @@ void TextDisplay::notifyCell(int r, int c, int change) {
 void TextDisplay::notifyFull() {
     // Only print if this display's perspective matches the current turn
     if (controller && controller->getCurrentTurn() == perspective) {
-        print(std::cout);
+        print(cout);
     }
 }
 
@@ -40,7 +40,7 @@ void TextDisplay::print(ostream& out) {
         // If viewing from Player 1's perspective, show all their links
         for (int i = 0; i < 8; ++i) {
             char k = 'a' + i;
-            auto it = p1->getLinks().find(std::string(1, k));
+            auto it = p1->getLinks().find(string(1, k));
             if (it != p1->getLinks().end()) {
                 if (it->second) {
                     out << k << ": " << it->second->makeString();
@@ -59,7 +59,7 @@ void TextDisplay::print(ostream& out) {
         for (int i = 0; i < 8; ++i) {
             char k = 'a' + i;
             if (known != pov->getKnownOpponentLinks().end()) {
-                auto it = known->second.find(std::string(1, k));
+                auto it = known->second.find(string(1, k));
                 if (it != known->second.end() && it->second) {
                     out << k << ": " << it->second->makeString();
                 } else {
@@ -81,33 +81,20 @@ void TextDisplay::print(ostream& out) {
         for (int c = 0; c < width; ++c) {
             Tile* t = board->getTileAt(r, c);
             char symbol = '.';
-            if (t->isServerPortTile()) symbol = 'S';
-            else if (t->isFirewallTile()) symbol = (t->getFirewallOwner() == p1 ? 'm' : 'w');
+            if (t->isServerPortTile()) {
+                symbol = 'S';
+            } 
+            else if (t->isFirewallTile()) {
+                symbol = (t->getFirewallOwner() == p1 ? 'm' : 'w');
+            } 
             else if (t->getOccupant()) {
                 Link* occ = t->getOccupant();
-                Player* owner = occ->getOwner();
-                if (owner == pov) {
-                    // Find letter for this link
-                    for (const auto& pair : pov->getLinks()) {
-                        if (pair.second.get() == occ) {
-                            symbol = pair.first[0];
-                            break;
-                        }
+                // Find letter for this link
+                for (const auto& pair : occ->getOwner()->getLinks()) {
+                    if (pair.second.get() == occ) {
+                        symbol = pair.first[0];
+                        break;
                     }
-                } else {
-                    // Is this link revealed?
-                    auto known = pov->getKnownOpponentLinks().find(owner);
-                    bool revealed = false;
-                    if (known != pov->getKnownOpponentLinks().end()) {
-                        for (const auto& pair : known->second) {
-                            if (pair.second.get() == occ) {
-                                symbol = pair.first[0];
-                                revealed = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (!revealed) symbol = '?';
                 }
             }
             out << symbol;
@@ -130,7 +117,7 @@ void TextDisplay::print(ostream& out) {
         // If viewing from Player 2's perspective, show all their links
         for (int i = 0; i < 8; ++i) {
             char k = 'A' + i;
-            auto it = p2->getLinks().find(std::string(1, k));
+            auto it = p2->getLinks().find(string(1, k));
             if (it != p2->getLinks().end()) {
                 if (it->second) {
                     out << k << ": " << it->second->makeString();
@@ -149,7 +136,7 @@ void TextDisplay::print(ostream& out) {
         for (int i = 0; i < 8; ++i) {
             char k = 'A' + i;
             if (known != pov->getKnownOpponentLinks().end()) {
-                auto it = known->second.find(std::string(1, k));
+                auto it = known->second.find(string(1, k));
                 if (it != known->second.end() && it->second) {
                     out << k << ": " << it->second->makeString();
                 } else {
