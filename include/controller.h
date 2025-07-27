@@ -23,7 +23,7 @@ class Controller {
     public:
         Controller() : board(std::make_unique<Board>()) {}
         Controller(std::unique_ptr<Board> b) : board(std::move(b)) {}
-        ~Controller() = default;
+        ~Controller() {}
 
         void setPlayers(const std::vector<Player*>& ps);
 

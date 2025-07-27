@@ -12,6 +12,7 @@ class Board : public Subject {
     std::vector<std::vector<std::unique_ptr<Tile>>> grid;
 
     public:
+        ~Board() {}
         void initialise(std::vector<Player*> players);
         void initialiseBoard(std::istream& in, std::vector<Player*> players);
         void initialiseBoard(std::istream& in, std::vector<Player*> players, const std::vector<std::string>& link1Order, const std::vector<std::string>& link2Order);

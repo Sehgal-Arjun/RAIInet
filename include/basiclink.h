@@ -31,7 +31,7 @@ public:
                                                                         linkType{isData ? LinkType::DATA : LinkType::VIRUS}, 
                                                                         travelDistance{1},
                                                                         place{t} {}
-
+    ~BasicLink() {}
     
     char getId() const override;
     void setId(char id) override;
