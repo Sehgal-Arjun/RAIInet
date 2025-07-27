@@ -214,14 +214,10 @@ void GraphicDisplay::drawBoard() {
     }
 }
 
-void GraphicDisplay::notifyCell(int row, int col, int change) {
-    // Update the display when notified of a cell change
-    print(cout);
-}
-
 void GraphicDisplay::notifyFull() {
-    // Redraw the entire display
-    print(cout);
+    if (perspective && board) {
+        print(cout);
+    }
 }
 
 void GraphicDisplay::print(ostream &out) {
@@ -255,6 +251,4 @@ void GraphicDisplay::print(ostream &out) {
 
 void GraphicDisplay::setPerspective(Player* newPerspective) {
     perspective = newPerspective;
-    // Immediately refresh the display with the new perspective
-    print(cout);
 }
