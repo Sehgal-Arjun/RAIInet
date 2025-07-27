@@ -10,7 +10,7 @@
 #include "../include/scan.h"
 #include "../include/polarise.h"
 #include "../include/knightify.h"
-#include "../include/warpify.h"
+#include "../include/tradeify.h"
 #include "../include/uploadify.h"
 #include "../include/weakenify.h"
 
@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
             case 'K': ability = new Knightify(i); break;
             case 'W': ability = new Weakenify(i); break;
             case 'U': ability = new Uploadify(i); break;
-            case 'T': ability = new Warpify(i); break;
+            case 'T': ability = new Tradeify(i); break;
             default:
                 cerr << "Error: Unknown ability character '" << c << "'" << endl;
                 return 1;
@@ -108,7 +108,7 @@ int main(int argc, char* argv[]) {
             case 'K': ability = new Knightify(i); break;
             case 'W': ability = new Weakenify(i); break;
             case 'U': ability = new Uploadify(i); break;
-            case 'T': ability = new Warpify(i); break;
+            case 'T': ability = new Tradeify(i); break;
             default:
                 cerr << "Error: Unknown ability character '" << c << "'" << endl;
                 return 1;

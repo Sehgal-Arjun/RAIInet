@@ -1,13 +1,13 @@
-#include "../include/warpify.h"
+#include "../include/tradeify.h"
 #include "../include/link.h"
 #include "../include/tile.h"
 #include <utility>
 
 using namespace std;
 
-Warpify::Warpify(int id): Ability("Warpify", id) {};
+Tradeify::Tradeify(int id): Ability("Tradeify", id) {};
 
-void Warpify::applyAbility(Link& l1, Link& l2) {
+void Tradeify::applyAbility(Link& l1, Link& l2) {
     Tile* tile1 = l1.getTile();
     Tile* tile2 = l2.getTile();
 
@@ -20,44 +20,44 @@ void Warpify::applyAbility(Link& l1, Link& l2) {
     tile2->setOccupant(&l1);
 }
 
-bool Warpify::isValidUse(Link* l1, Link* l2) const {
+bool Tradeify::isValidUse(Link* l1, Link* l2) const {
     // links must be distinct
     return !((l1->getStrength() == l2->getStrength()) && (l1->getLinkType() == l2->getLinkType()) && (l1->getOwner() == l2->getOwner()));
 }
 
 
-void Warpify::applyAbility(Link& l) {
+void Tradeify::applyAbility(Link& l) {
     // Empty implementation
 }
 
-void Warpify::applyAbility(Tile& t, Player& p) {
+void Tradeify::applyAbility(Tile& t, Player& p) {
     // Empty implementation
 }
 
-void Warpify::applyAbility(Link& l, Player& p) {
+void Tradeify::applyAbility(Link& l, Player& p) {
     // Empty implementation
 }
 
-void Warpify::applyAbility(Link& l, Player& p, Tile& location) {
+void Tradeify::applyAbility(Link& l, Player& p, Tile& location) {
     // Empty implementation
 }
 
-bool Warpify::isValidUse(Link* l) const {
-    // Empty implementation
-    return false;
-}
-
-bool Warpify::isValidUse(Link* l, Player* p) const {
+bool Tradeify::isValidUse(Link* l) const {
     // Empty implementation
     return false;
 }
 
-bool Warpify::isValidUse(Tile* t) const {
+bool Tradeify::isValidUse(Link* l, Player* p) const {
     // Empty implementation
     return false;
 }
 
-bool Warpify::isValidUse(Link* l, Player* p, Tile* location) const {
+bool Tradeify::isValidUse(Tile* t) const {
+    // Empty implementation
+    return false;
+}
+
+bool Tradeify::isValidUse(Link* l, Player* p, Tile* location) const {
     // Empty implementation
     return false;
 }

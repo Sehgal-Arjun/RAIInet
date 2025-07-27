@@ -9,7 +9,7 @@ CCFILES=$(SRC)/main.cc $(SRC)/controller.cc $(SRC)/board.cc $(SRC)/player.cc \
         $(SRC)/basiclink.cc $(SRC)/tile.cc $(SRC)/subject.cc \
         $(SRC)/boostedlink.cc $(SRC)/weakenedlink.cc $(SRC)/knightedlink.cc \
         $(SRC)/firewall.cc $(SRC)/link.cc $(SRC)/linkboost.cc $(SRC)/linkdecorator.cc \
-        $(SRC)/polarise.cc $(SRC)/weakenify.cc $(SRC)/warpify.cc $(SRC)/knightify.cc \
+        $(SRC)/polarise.cc $(SRC)/weakenify.cc $(SRC)/tradeify.cc $(SRC)/knightify.cc \
         $(SRC)/download.cc $(SRC)/uploadify.cc $(SRC)/scan.cc $(SRC)/ability.cc
 OBJECTS=$(CCFILES:$(SRC)/%.cc=$(COMPILED)/%.o)
 DEPENDS=$(CCFILES:$(SRC)/%.cc=$(COMPILED)/%.d)

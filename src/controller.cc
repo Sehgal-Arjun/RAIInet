@@ -286,7 +286,7 @@ void Controller::useAbility(Ability& a, Link& l){
     }
 }
 
-// useAbility for Warpify
+// useAbility for Tradeify
 void Controller::useAbility(Ability& a, Link& l1, Link& l2){
     if (a.isValidUse(&l1, &l2)){
         a.applyAbility(l1, l2);
@@ -462,7 +462,7 @@ bool Controller::executeCommand(string input){
                     }
                 }
 
-                else if (ability->getName() == "Warpify"){
+                else if (ability->getName() == "Tradeify"){
                     // next should be a link, and need another link to warp with
                     char link1 = next[0];
                     char link2;

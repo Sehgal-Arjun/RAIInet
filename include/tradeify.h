@@ -1,11 +1,11 @@
-#ifndef WARPIFY_H
-#define WARPIFY_H
+#ifndef TRADEIFY_H
+#define TRADEIFY_H
 
 #include "ability.h"
 
-class Warpify: public Ability {
+class Tradeify: public Ability {
 public:
-    Warpify(int id);
+    Tradeify(int id);
     void applyAbility(Link& l1, Link& l2) override;
     
     // p is the person who used the download ability, l should be owned by another player
@@ -21,4 +21,4 @@ public:
     bool isValidUse(Link* l, Player* p, Tile* location) const override;
 };
 
-#endif // WARPIFY_H 
+#endif // TRADEIFY_H 
