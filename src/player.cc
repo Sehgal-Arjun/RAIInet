@@ -25,36 +25,39 @@ void Player::assignLinks(std::vector<std::unique_ptr<Link>>&& ls){
     }
 
     for (auto& link: ls){
+        link->setId(key);
         this->links[string(1, key)] = std::move(link);
+        this->originalLinks[string(1, key)] = this->links[string(1, key)].get();
         key++;
     }
 }
 
-void Player::download(Link* l){
-    // 1. mark link as not in use
+unique_ptr<Link> Player::download(Link* l){
+    // mark link as not in use
     l->setInUse(false);
     
-    // 2. indicate that the Link isn't on a Tile
-    l->getTile()->setOccupant(nullptr);
-    l->setTile(nullptr);
+    // indicate that the Link isn't on a Tile
+    if (l->getTile() != nullptr) {
+        l->getTile()->setOccupant(nullptr);
+        l->setTile(nullptr);
+    }
 
-    // 3. increment data/virusAmountDownloaded
-    if (l->getLinkType() == LinkType::DATA) {
-        this->dataAmountDownloaded++;
-    }
-    else if (l->getLinkType() == LinkType::VIRUS){
-        this->virusAmountDownloaded++;
-    }
+
+    // remove the link from the player's vector of links and return it
+    string key = string(1, l->getId());
+    auto linkPtr = move(links[key]);
+    links.erase(key);
+    return linkPtr;
 }
 
-void Player::upload(Link* l, Tile* tile){
-    // 1. mark link as in use
+void Player::upload(unique_ptr<Link> l, Tile* tile){
+    // mark link as in use
     l->setInUse(true);
     
-    // 2. put the link on the appropriate tile
+    // put the link on the appropriate tile
     l->setTile(tile);
 
-    // 3. decrement data/virusAmountDownloaded
+    // decrement data/virusAmountDownloaded
     if (l->getLinkType() == LinkType::DATA) {
         this->dataAmountDownloaded--;
     }
@@ -62,8 +65,11 @@ void Player::upload(Link* l, Tile* tile){
         this->virusAmountDownloaded--;
     }
 
-    //4. make sure the tile knows it has an occupant
-    tile->setOccupant(l);
+    // make sure the tile knows it has an occupant
+    tile->setOccupant(l.get());
+
+    // add the link to the player's active links map (move from downloaded to active)
+    links[string(1, l->getId())] = std::move(l);
 }
 
 void Player::printAbilities(ostream& out) {
@@ -83,19 +89,56 @@ Ability* Player::getAbility(int id) const {
     return this->chosenAbilities.at(id).get();
 }
 
+void Player::addAbility(Ability* a){
+    this->chosenAbilities.push_back(unique_ptr<Ability>(a));
+}
+
+void Player::storeDownloadedLink(unique_ptr<Link> l) {
+    string key = string(1, l->getId());
+    downloadedLinks[key] = std::move(l);
+}
+
+void Player::incrementDataDownloaded() {
+    this->dataAmountDownloaded++;
+}
+
+void Player::incrementVirusDownloaded() {
+    this->virusAmountDownloaded++;
+}
+
 void Player::boostLink(Link* l, int boostAmount) {
     for (auto& pair : links) {
         if (pair.second.get() == l) {
-            pair.second = make_unique<BoostedLink>(l, boostAmount);
+            // store the tile that the link is currently on
+            Tile* currentTile = l->getTile();
+            
+            // release it so we can make a new one that's boosted
+            auto releasedLink = pair.second.release();
+            pair.second = make_unique<BoostedLink>(releasedLink, boostAmount);
+            
+            // update the tile's occupant to point to the new decorator
+            if (currentTile) {
+                currentTile->setOccupant(pair.second.get());
+            }
             break;
         }
     }
 }
 
-void Player::weakenLink(Link* l, int debuffAmount) {
-    for (auto& pair : links) {
+void Player::weakenLink(Link* l, int weakenAmount) {
+    for (auto& pair: links) {
         if (pair.second.get() == l) {
-            pair.second = make_unique<WeakenedLink>(l, debuffAmount);
+            // store the tile that the link is currently on
+            Tile* currentTile = l->getTile();
+            
+            // release it so we can make a new one that's weakened
+            auto releasedLink = pair.second.release();
+            pair.second = make_unique<WeakenedLink>(releasedLink, weakenAmount);
+            
+            // update the tile's occupant to point to the new decorator
+            if (currentTile) {
+                currentTile->setOccupant(pair.second.get());
+            }
             break;
         }
     }
@@ -104,7 +147,17 @@ void Player::weakenLink(Link* l, int debuffAmount) {
 void Player::knightLink(Link* l) {
     for (auto& pair : links) {
         if (pair.second.get() == l) {
-            pair.second = make_unique<KnightedLink>(l);
+            // store the tile that the link is currently on
+            Tile* currentTile = l->getTile();
+            
+            // release it so we can make a new one that's knighted
+            auto releasedLink = pair.second.release();
+            pair.second = make_unique<KnightedLink>(releasedLink);
+            
+            // update the tile's occupant to point to the new decorator
+            if (currentTile) {
+                currentTile->setOccupant(pair.second.get());
+            }
             break;
         }
     }
@@ -112,11 +165,11 @@ void Player::knightLink(Link* l) {
 
 void Player::reveal(Link* l){
     if (l->getOwner() != this){ // make sure we're not adding to the map if it's your own link
-        if (l->getLinkType() == LinkType::DATA){
-            knownOpponentLinks[l->getOwner()]["D" + to_string(l->getStrength())] = shared_ptr<Link>(l);
-        }
-        else if (l->getLinkType() == LinkType::VIRUS){
-            knownOpponentLinks[l->getOwner()]["V" + to_string(l->getStrength())] = shared_ptr<Link>(l);
+        for (const auto& pair : l->getOwner()->getLinks()) {
+            if (pair.second.get() == l) {
+                knownOpponentLinks[l->getOwner()][pair.first] = pair.second.get();
+                break;
+            }
         }
     }
 }
@@ -125,22 +178,40 @@ int Player::getPlayerId() const{ return playerId; }
 
 map<string, unique_ptr<Link>>& Player::getLinks() { return links; }
 
+map<string, unique_ptr<Link>>& Player::getDownloadedLinks() { return downloadedLinks; }
+
 Link* Player::getLink(char link) {
     if (!((link >= 'a' && link <= 'h') || (link >= 'A' && link <= 'H'))) {
         return nullptr;
     }
     string key = string(1, link);
+    
+    // First check active links
     auto it = this->links.find(key);
-    return (it != this->links.end()) ? it->second.get() : nullptr;
+    if (it != this->links.end()) {
+        return it->second.get();
+    }
+    
+    // Then check downloaded links
+    auto downloadedIt = this->downloadedLinks.find(key);
+    if (downloadedIt != this->downloadedLinks.end()) {
+        return downloadedIt->second.get();
+    }
+    
+    return nullptr;
 }
 
-map<Player*, map<string, shared_ptr<Link>>>& Player::getKnownOpponentLinks() {
+map<Player*, map<string, Link*>>& Player::getKnownOpponentLinks() {
     return knownOpponentLinks;
+}
+
+map<string, Link*>& Player::getOriginalLinks() {
+    return originalLinks;
 }
 
 int Player::getDataAmountDownloaded(){ return dataAmountDownloaded; }
 
-int Player::getVirusAmountDownloaded(){ return dataAmountDownloaded; }
+int Player::getVirusAmountDownloaded(){ return virusAmountDownloaded; }
 
 bool Player::getHasWon() { return hasWon; }
 

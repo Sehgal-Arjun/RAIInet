@@ -12,7 +12,7 @@
 
 using namespace std;
 
-void Board::initialiseBoard(istream& in, vector<Player*> players) {
+void Board::initialise(vector<Player*> players) {
     height = 8;
     width = 8;
     grid.clear();
@@ -23,10 +23,10 @@ void Board::initialiseBoard(istream& in, vector<Player*> players) {
         for (int c = 0; c < width; ++c) {
             unique_ptr<Tile> tile = make_unique<Tile>();
             tile->setLocation(make_pair(r, c));
-            row.push_back(move(tile));
+            row.push_back(std::move(tile));
         }
 
-        grid.push_back(move(row));
+        grid.push_back(std::move(row));
     }
 
     grid.at(0).at(width / 2)->enableServerPort();
@@ -37,49 +37,84 @@ void Board::initialiseBoard(istream& in, vector<Player*> players) {
     grid.at(height - 1).at(width / 2)->setServerPortOwner(players.at(1));
     grid.at(height - 1).at(width / 2 - 1)->enableServerPort();    
     grid.at(height - 1).at(width / 2 - 1)->setServerPortOwner(players.at(1));
-
-    // for now, only supporting randomised link order
-    vector<unique_ptr<Link>> linksP1 = randomiseLinks( players.at(0));
-    vector<unique_ptr<Link>> linksP2 = randomiseLinks( players.at(1));
-
-    for (auto& l: linksP1){
-        l->getTile()->setOccupant(l.get());
-    }
-    for (auto& l: linksP2){
-        l->getTile()->setOccupant(l.get());
-    }
-    players.at(0)->assignLinks(move(linksP1));
-    players.at(1)->assignLinks(move(linksP2));
 }
 
-void Board::placeLink(Link& l, Tile* t) {
-    t->setOccupant(&l);
-    l.setTile(t);
-    auto loc = t->getLocation();
-    int change = (l.getLinkType() == LinkType::DATA) ? 2 : 3; // 2: data, 3: virus
-    notifyObserversCell(loc.first, loc.second, change);
-    notifyObserversFull();
+void Board::placeLinkVectors(vector<unique_ptr<Link>>& linksP1, vector<unique_ptr<Link>>& linksP2, vector<Player*> players) {
+    for (int i = 0; i < grid.at(0).size(); i++){
+        int row = 0;
+        if (grid.at(0).at(i)->isServerPortTile()){
+            row = 1;
+        }
+        grid.at(row).at(i)->setOccupant(linksP1.at(i).get());
+        linksP1.at(i)->setTile(grid.at(row).at(i).get());
+    }
+
+    for (int i = 0; i < grid.at(height-1).size(); i++){
+        int row = height - 1;
+        if (grid.at(row).at(i)->isServerPortTile()){
+            row = height - 2;
+        }
+        grid.at(row).at(i)->setOccupant(linksP2.at(i).get());
+        linksP2.at(i)->setTile(grid.at(row).at(i).get());
+    }
+
+    players.at(0)->assignLinks(std::move(linksP1));
+    players.at(1)->assignLinks(std::move(linksP2));
+}
+
+void Board::initialiseBoard(istream& in, vector<Player*> players) {
+    initialise(players);
+
+    // for now, only supporting randomised link order
+    vector<unique_ptr<Link>> linksP1 = randomiseLinks(players.at(0));
+    vector<unique_ptr<Link>> linksP2 = randomiseLinks(players.at(1));
+
+    placeLinkVectors(linksP1, linksP2, players);
+}
+
+void Board::initialiseBoard(istream& in, vector<Player*> players, const vector<string>& link1Order, const vector<string>& link2Order) {
+    initialise(players);
+
+    vector<unique_ptr<Link>> linksP1, linksP2;
+    
+    if (link1Order.empty()) {
+        linksP1 = randomiseLinks(players.at(0));
+    } else {
+        linksP1 = createLinksFromOrder(players.at(0), link1Order);
+    }
+    
+    if (link2Order.empty()) {
+        linksP2 = randomiseLinks(players.at(1));
+    } else {
+        linksP2 = createLinksFromOrder(players.at(1), link2Order);
+    }
+
+    placeLinkVectors(linksP1, linksP2, players);
 }
 
 void Board::reveal(Link* l, Player& p) {
     Player* owner = l->getOwner();
     string label;
+    const std::unique_ptr<Link>* linkPtr = nullptr;
 
     for (const auto& pair : owner->getLinks()) {
         if (pair.second.get() == l) {
             label = pair.first;
+            linkPtr = &pair.second;
             break;
         }
     }
 
-    if (!label.empty()) {
-        p.getKnownOpponentLinks()[owner][label] = shared_ptr<Link>(l, [](Link*){});
+    if (!label.empty() && linkPtr) {
+        p.getKnownOpponentLinks()[owner][label] = linkPtr->get();
     }
 
-    auto loc = l->getTile()->getLocation();
-    int change = (l->getLinkType() == LinkType::DATA) ? 2 : 3;
-    notifyObserversCell(loc.first, loc.second, change);
-    notifyObserversFull();
+    if (l->getTile() != nullptr) {
+        auto loc = l->getTile()->getLocation();
+        int change = (l->getLinkType() == LinkType::DATA) ? 2 : 3;
+        notifyObserversCell(loc.first, loc.second, change);
+        notifyObserversFull();
+    }
 }
 
 vector<unique_ptr<Link>> Board::randomiseLinks(Player* p) {
@@ -99,9 +134,34 @@ vector<unique_ptr<Link>> Board::randomiseLinks(Player* p) {
 
         int strength = (i % 4) + 1;
 
-        randomisedOrder[linkNums[i]] = make_unique<BasicLink>(strength, isData, getTileAt(i, y), p);
+        randomisedOrder[linkNums[i]] = make_unique<BasicLink>(strength, isData, getTileAt(y, i), p);
     }
     return randomisedOrder;
+}
+
+vector<unique_ptr<Link>> Board::createLinksFromOrder(Player* p, const vector<string>& linkOrder) {
+    vector<unique_ptr<Link>> orderedLinks(8);
+    
+    int y = (p->getPlayerId() == 2) ? height - 1 : 0;
+    
+    for (int i = 0; i < 8; i++) {
+        string linkSpec = linkOrder[i];
+        if (linkSpec.length() != 2) {
+            throw invalid_argument("Invalid link specification: " + linkSpec);
+        }
+        
+        char type = linkSpec[0];
+        int strength = linkSpec[1] - '0';
+        
+        if ((type != 'V' && type != 'D') || strength < 1 || strength > 4) {
+            throw invalid_argument("Invalid link specification: " + linkSpec);
+        }
+        
+        bool isData = (type == 'D');
+        orderedLinks[i] = make_unique<BasicLink>(strength, isData, getTileAt(y, i), p);
+    }
+    
+    return orderedLinks;
 }
 
 Tile* Board::getTileAt(int row, int col) const {
@@ -110,4 +170,12 @@ Tile* Board::getTileAt(int row, int col) const {
     }
 
     return grid[row][col].get();
+}
+
+int Board::getHeight() const {
+    return height;
+}
+
+int Board::getWidth() const {
+    return width;
 }

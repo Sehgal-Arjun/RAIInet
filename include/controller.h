@@ -23,11 +23,15 @@ class Controller {
     public:
         Controller() : board(std::make_unique<Board>()) {}
         Controller(std::unique_ptr<Board> b) : board(std::move(b)) {}
-        ~Controller() = default;
+        ~Controller() {}
 
         void setPlayers(const std::vector<Player*>& ps);
 
         void addView(View* v);
+        
+        Board* getBoard() const { return board.get(); }
+        
+        Player* getCurrentTurn() const { return currentTurn; }
 
         bool makeMove(Link& l, const std::string direction, Player& p);
         bool makeMove(Link& l, const std::string directionFirst, const std::string directionSecond, Player& p);
@@ -48,10 +52,11 @@ class Controller {
         void useAbility(Ability& a, Link& l1, Link& l2);
         void useAbility(Ability& a, Player& p, Link& l, Tile& t);
 
-        bool checkGameWon();
+        int checkGameWon();
         void switchTurn();
         bool executeCommand(std::string input);
         void play();
+        void clearViews();
 };
 
 #endif // CONTROLLER_H

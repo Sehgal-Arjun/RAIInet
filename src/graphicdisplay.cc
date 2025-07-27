@@ -1,7 +1,10 @@
 #include "../include/graphicdisplay.h"
 #include <iostream>
+#include <string>
 
-GraphicDisplay::GraphicDisplay(Board* b, std::vector<Player*>* ps, Player* persp, int n)
+using namespace std;
+
+GraphicDisplay::GraphicDisplay(Board* b, vector<Player*>* ps, Player* persp, int n)
     : xw(500, 500), gridSize{n}, cellSize{500 / n}, board(b), players(ps), perspective(persp) {}
 
 GraphicDisplay::~GraphicDisplay() {}
@@ -19,7 +22,7 @@ void GraphicDisplay::notifyCell(int row, int col, int change) {
     // 7+: other features (extend as needed)
 
     int colour = Xwindow::Black;
-    std::string cellText = "";
+    string cellText = "";
 
     switch (change) {
         case 0: // Empty
@@ -68,10 +71,10 @@ void GraphicDisplay::notifyCell(int row, int col, int change) {
 
 void GraphicDisplay::notifyFull() {
     // Optionally redraw the whole board or print a summary
-    print(std::cout);
+    print(cout);
 }
 
-void GraphicDisplay::print(std::ostream &out) {
+void GraphicDisplay::print(ostream &out) {
     Player* p1 = (*players)[0];
     Player* p2 = (*players)[1];
     Player* pov = perspective;
@@ -82,7 +85,7 @@ void GraphicDisplay::print(std::ostream &out) {
         for (int c = 0; c < width; ++c) {
             Tile* t = board->getTileAt(r, c);
             int colour = Xwindow::White;
-            std::string cellText = "";
+            string cellText = "";
             if (t->isServerPortTile()) {
                 colour = Xwindow::White;
                 cellText = "S";
@@ -107,7 +110,7 @@ void GraphicDisplay::print(std::ostream &out) {
                     bool revealed = false;
                     if (known != pov->getKnownOpponentLinks().end()) {
                         for (const auto& pair : known->second) {
-                            if (pair.second.get() == occ) {
+                            if (pair.second == occ) {
                                 cellText = pair.first;
                                 colour = Xwindow::Black;
                                 revealed = true;

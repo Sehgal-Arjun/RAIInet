@@ -9,6 +9,11 @@
 using namespace std;
 
 std::pair<int, int> Controller::calculateMove(Link* l, std::string direction){
+    if (l->getTile() == nullptr) {
+        // Link has been downloaded, return invalid position
+        return make_pair(-1, -1);
+    }
+    
     int row = l->getTile()->getLocation().first;
     int col = l->getTile()->getLocation().second;
 
@@ -27,6 +32,11 @@ std::pair<int, int> Controller::calculateMove(Link* l, std::string direction){
 }
 
 std::pair<int, int> Controller::calculateMove(Link* l, std::string direction1, std::string direction2){
+    if (l->getTile() == nullptr) {
+        // Link has been downloaded, return invalid position
+        return make_pair(-1, -1);
+    }
+    
     int row = l->getTile()->getLocation().first;
     int col = l->getTile()->getLocation().second;
 
@@ -86,7 +96,6 @@ void Controller::move(pair<int, int> location, Link& l, Player& p) {
     
     // if moving onto tile which has a link that isn't yours
     if (destination->getOccupant() != nullptr && destination->getOccupant()->getOwner() != &p) {
-        
         // if the battle leads to your link losing (ie, don't need to move it), then return
         if (&battle(l, *destination->getOccupant(), *destination, *l.getTile()) != &l) {
             return;
@@ -104,8 +113,7 @@ void Controller::move(pair<int, int> location, Link& l, Player& p) {
     l.setTile(destination);
     destination->setOccupant(&l);
 
-    switchTurn();
-    board->notifyObserversFull();
+    // Don't notify observers here - will be done after turn switch
 }
 
 bool Controller::checkValidMove(Link* l, pair<int, int> location) {
@@ -167,14 +175,24 @@ bool Controller::makeMove(Link& l, const std::string directionFirst, const std::
     return true;
 }
 
-bool Controller::isValidMove(Link* l, const std::string& direction) {
-    if (direction != "up" && direction != "down" && direction != "left" && direction != "right") { return false; }
+bool Controller::isValidMove(Link* l, const std::string& direction) {    
+    if (direction != "up" && direction != "down" && direction != "left" && direction != "right") { 
+        return false; 
+    }
 
     if (l->getOwner() != currentTurn) {
         return false;
     }
 
-    return checkValidMove(l, calculateMove(l, direction));
+    // Check if link has been downloaded
+    if (l->getTile() == nullptr) {
+        return false;
+    }
+
+    pair<int, int> targetLocation = calculateMove(l, direction);
+    bool result = checkValidMove(l, targetLocation);
+
+    return result;
 }
 
 bool Controller::isValidMove(Link* l, const std::string& directionFirst, const std::string& directionSecond) {
@@ -194,6 +212,11 @@ bool Controller::isValidMove(Link* l, const std::string& directionFirst, const s
     }
 
     if (l->getOwner() != currentTurn) {
+        return false;
+    }
+
+    // Check if link has been downloaded
+    if (l->getTile() == nullptr) {
         return false;
     }
 
@@ -234,6 +257,7 @@ void Controller::useAbility(Ability& a, Player& p, Link& l) {
 
     if (a.isValidUse(&l, &p)){
         a.applyAbility(l, p);
+        a.setUsed(true);
     }
     else {
         cout << "INVALID ABILITY: " << a.getName() << endl;
@@ -244,6 +268,7 @@ void Controller::useAbility(Ability& a, Player& p, Link& l) {
 void Controller::useAbility(Ability& a, Player& p, Tile& t) {
     if (a.isValidUse(&t)){
         a.applyAbility(t, p);
+        a.setUsed(true);
     }
     else{
         cout << "INVALID ABILITY: " << a.getName() << endl;
@@ -254,16 +279,18 @@ void Controller::useAbility(Ability& a, Player& p, Tile& t) {
 void Controller::useAbility(Ability& a, Link& l){
     if (a.isValidUse(&l)){
         a.applyAbility(l);
+        a.setUsed(true);
     }
     else{
         cout << "INVALID ABILITY: " << a.getName() << endl;
     }
 }
 
-// useAbility for Warpify
+// useAbility for Tradeify
 void Controller::useAbility(Ability& a, Link& l1, Link& l2){
     if (a.isValidUse(&l1, &l2)){
         a.applyAbility(l1, l2);
+        a.setUsed(true);
     }
     else{
         cout << "INVALID ABILITY: " << a.getName() << endl;
@@ -274,41 +301,39 @@ void Controller::useAbility(Ability& a, Link& l1, Link& l2){
 void Controller::useAbility(Ability& a, Player& p, Link& l, Tile& t){
     if (a.isValidUse(&l, &p, &t)){
         a.applyAbility(l, p, t);
+        a.setUsed(true);
     }
     else{
         cout << "INVALID ABILITY: " << a.getName() << endl;
     }
 }
 
-bool Controller::checkGameWon() {
+int Controller::checkGameWon() {
     for (auto& p : this->players) {
-        if (p->getDataAmountDownloaded() == 4) {
-            p->setHasWon();
-            return true;
+        if (p->getDataAmountDownloaded() >= 4) {
+            return p->getPlayerId();  // Just return, don't modify state
         }
 
-        if (p->getVirusAmountDownloaded() == 4) {
-            p->setHasLost();
+        if (p->getVirusAmountDownloaded() >= 4) {
             int remainingPlayers = players.size();
 
             for (auto& pl : this->players) {
-                if (pl->getHasLost()) {
+                if (pl->getVirusAmountDownloaded() >= 4) {  // Check the actual condition
                     remainingPlayers--;
                 }
             }
 
             if (remainingPlayers == 1) {
                 for (auto& pl : this->players) {
-                    if (!pl->getHasLost()) {
-                        pl->setHasWon();
-                        return true;
+                    if (pl->getVirusAmountDownloaded() < 4) {  // Check the actual condition
+                        return pl->getPlayerId();
                     }
                 }
             }
         }
     }
 
-    return false;
+    return -1;
 }
 
 void Controller::switchTurn() {
@@ -325,6 +350,7 @@ void Controller::switchTurn() {
             
             if (cur) {
                 currentTurn = p;
+                break;
             }
         }
     }
@@ -336,20 +362,18 @@ void Controller::addView(View* v) {
 }
 
 Link* Controller::getLink(char name){
-    if ('a' <= name && name <= 'h') {
-        // if it's player 1's link
-        return players.at(0)->getLink(name);
+    // Search both players for the link
+    for (auto player : players) {
+        Link* link = player->getLink(name);
+        if (link != nullptr) {
+            return link;
+        }
     }
-    else if ('A' <= name && name <= 'H') {
-        // if it's player 2's link
-        return players.at(1)->getLink(name);
-    }
-    else {
-        return nullptr;
-    }
+    
+    return nullptr;
 }
 
-bool Controller::executeCommand(string input){
+bool Controller::executeCommand(string input){    
     istringstream stream(input);
     string cmd;
     stream >> cmd;
@@ -357,18 +381,21 @@ bool Controller::executeCommand(string input){
         char l;
         stream >> l;
         Link* link = getLink(l);
-        if (link->isKnight()){
+        
+        if (link && link->isKnight()){
             string direction1, direction2;
             stream >> direction1 >> direction2;
             if (makeMove(*link, direction1, direction2, *currentTurn)){
                 switchTurn();
+                board->notifyObserversFull();
             }
         }
-        else{
+        else if (link){
             string direction;
             stream >> direction;
             if (makeMove(*link, direction, *currentTurn)){
                 switchTurn();
+                board->notifyObserversFull();
             }
         }
     }
@@ -406,15 +433,22 @@ bool Controller::executeCommand(string input){
                     }
                 }
                 
-                else if (ability->getName() == "Firewall" ) {    
+                else if (ability->getName() == "Firewall" ) {   
                     // next should be the tile, so should be 0-7, and need another char 0-7
-                    char x = next[0];
-                    char y;
-                    stream >> y;
-                    if (x <= 7 && x >= 0 && y <= 7 && y >= 0){
-                        useAbility(*ability, *currentTurn, *board->getTileAt(x, y));
-                    }
-                    else{
+                    int x;
+                    int y;
+                    try {
+                        x = stoi(next);
+                        stream >> y;
+                        if (x <= 7 && x >= 0 && y <= 7 && y >= 0){
+                            useAbility(*ability, *currentTurn, *board->getTileAt(x, y));
+                        }
+                        else{
+                            cout << "Invalid input!" << endl;
+                        }
+                    } catch (const std::invalid_argument& e) {
+                        cout << "Invalid input!" << endl;
+                    } catch (const std::out_of_range& e) {
                         cout << "Invalid input!" << endl;
                     }
                 }
@@ -430,7 +464,7 @@ bool Controller::executeCommand(string input){
                     }
                 }
 
-                else if (ability->getName() == "Warpify"){
+                else if (ability->getName() == "Tradeify"){
                     // next should be a link, and need another link to warp with
                     char link1 = next[0];
                     char link2;
@@ -446,7 +480,7 @@ bool Controller::executeCommand(string input){
                 else if (ability->getName() == "Uploadify") {
                     // next shoud be a link, followed by the coordinates of a tile
                     char link = next[0];
-                    char x, y;
+                    int x, y;
                     stream >> x >> y;
                     if (((link <= 'h' && link >= 'a') || (link <= 'H' && link >= 'A')) && ((x >= 0 && x <= board->getWidth() - 1) && (y >= 0 && y <= board->getHeight() - 1))){
                         useAbility(*ability, *currentTurn, *getLink(link), *board->getTileAt(x, y));
@@ -464,7 +498,7 @@ bool Controller::executeCommand(string input){
     }
 
     else if (cmd == "board"){
-        views.at(0)->print(cout);
+        views.at(currentTurn->getPlayerId() - 1)->print(cout);
     }
 
     else if (cmd == "sequence") {
@@ -473,7 +507,14 @@ bool Controller::executeCommand(string input){
         ifstream file(filename);
         string cmd;
         while(getline(file, cmd)) {
-            executeCommand(cmd);
+            if (!executeCommand(cmd)) {
+                return false;  // If any command says to quit, stop
+            }
+            int winStatus = checkGameWon();
+            if (winStatus != -1) {
+                cout << "Player " << winStatus << " wins!" << endl;
+                return false;  // Game won, stop executing
+            }
         }
     }
 
@@ -492,12 +533,17 @@ void Controller::play(){
             break;
         }
         int winStatus = checkGameWon();
-        if (winStatus != 0) {
-            cout << "Player " << winStatus << " wins!" << endl; 
+        if (winStatus != -1) {
+            cout << "Player " << winStatus << " wins!" << endl;
+            break;
         }
     }
 }
 
 void Controller::setPlayers(const std::vector<Player*>& players) {
     this->players = players;
+}
+
+void Controller::clearViews(){
+    views.clear();
 }

@@ -3,6 +3,14 @@
 
 using namespace std;
 
+char BasicLink::getId() const {
+    return id;
+}
+
+void BasicLink::setId(char x) {
+    id = x;
+}
+
 int BasicLink::getStrength() const {
     return strength;
 }
@@ -17,6 +25,10 @@ LinkType BasicLink::getLinkType() const {
 
 Player* BasicLink::getOwner() const {
     return owner;
+}
+
+void BasicLink::setOwner(Player* p) {
+    owner = p;
 }
 
 bool BasicLink::isInUse() const {
