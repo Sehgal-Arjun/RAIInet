@@ -9,6 +9,11 @@
 using namespace std;
 
 std::pair<int, int> Controller::calculateMove(Link* l, std::string direction){
+    if (l->getTile() == nullptr) {
+        // Link has been downloaded, return invalid position
+        return make_pair(-1, -1);
+    }
+    
     int row = l->getTile()->getLocation().first;
     int col = l->getTile()->getLocation().second;
 
@@ -27,6 +32,11 @@ std::pair<int, int> Controller::calculateMove(Link* l, std::string direction){
 }
 
 std::pair<int, int> Controller::calculateMove(Link* l, std::string direction1, std::string direction2){
+    if (l->getTile() == nullptr) {
+        // Link has been downloaded, return invalid position
+        return make_pair(-1, -1);
+    }
+    
     int row = l->getTile()->getLocation().first;
     int col = l->getTile()->getLocation().second;
 
@@ -86,7 +96,6 @@ void Controller::move(pair<int, int> location, Link& l, Player& p) {
     
     // if moving onto tile which has a link that isn't yours
     if (destination->getOccupant() != nullptr && destination->getOccupant()->getOwner() != &p) {
-        
         // if the battle leads to your link losing (ie, don't need to move it), then return
         if (&battle(l, *destination->getOccupant(), *destination, *l.getTile()) != &l) {
             return;
@@ -175,9 +184,14 @@ bool Controller::isValidMove(Link* l, const std::string& direction) {
         return false;
     }
 
+    // Check if link has been downloaded
+    if (l->getTile() == nullptr) {
+        return false;
+    }
+
     pair<int, int> targetLocation = calculateMove(l, direction);
     bool result = checkValidMove(l, targetLocation);
-    
+
     return result;
 }
 
@@ -198,6 +212,11 @@ bool Controller::isValidMove(Link* l, const std::string& directionFirst, const s
     }
 
     if (l->getOwner() != currentTurn) {
+        return false;
+    }
+
+    // Check if link has been downloaded
+    if (l->getTile() == nullptr) {
         return false;
     }
 
@@ -368,7 +387,7 @@ bool Controller::executeCommand(string input){
         stream >> l;
         Link* link = getLink(l);
         
-        if (link->isKnight()){
+        if (link && link->isKnight()){
             string direction1, direction2;
             stream >> direction1 >> direction2;
             if (makeMove(*link, direction1, direction2, *currentTurn)){
@@ -376,7 +395,7 @@ bool Controller::executeCommand(string input){
                 board->notifyObserversFull();
             }
         }
-        else{
+        else if (link){
             string direction;
             stream >> direction;
             if (makeMove(*link, direction, *currentTurn)){
