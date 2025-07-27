@@ -2,8 +2,20 @@
 
 LinkDecorator::LinkDecorator(Link* next) : next(next) {} 
 
+char LinkDecorator::getId() const {
+    return next->getId();
+}
+
+void LinkDecorator::setId(char id) {
+    next->setId(id);
+}
+
 Player* LinkDecorator::getOwner() const {
     return next->getOwner();
+}
+
+void LinkDecorator::setOwner(Player* p){
+    next->setOwner(p);
 }
 
 bool LinkDecorator::isInUse() const {

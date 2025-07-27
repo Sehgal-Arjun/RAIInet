@@ -110,7 +110,7 @@ void GraphicDisplay::print(ostream &out) {
                     bool revealed = false;
                     if (known != pov->getKnownOpponentLinks().end()) {
                         for (const auto& pair : known->second) {
-                            if (pair.second.get() == occ) {
+                            if (pair.second == occ) {
                                 cellText = pair.first;
                                 colour = Xwindow::Black;
                                 revealed = true;

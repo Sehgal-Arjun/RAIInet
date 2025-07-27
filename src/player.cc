@@ -25,38 +25,48 @@ void Player::assignLinks(std::vector<std::unique_ptr<Link>>&& ls){
     }
 
     for (auto& link: ls){
+        link->setId(key);
         this->links[string(1, key)] = std::move(link);
         key++;
     }
 }
 
-void Player::download(Link* l){
-    // 1. mark link as not in use
+unique_ptr<Link> Player::download(Link* l){
+    // mark link as not in use
     l->setInUse(false);
     
-    // 2. indicate that the Link isn't on a Tile
+    // indicate that the Link isn't on a Tile
     if (l->getTile() != nullptr) {
         l->getTile()->setOccupant(nullptr);
         l->setTile(nullptr);
     }
 
-    // 3. increment data/virusAmountDownloaded
+    // increment data/virusAmountDownloaded
     if (l->getLinkType() == LinkType::DATA) {
         this->dataAmountDownloaded++;
     }
     else if (l->getLinkType() == LinkType::VIRUS){
         this->virusAmountDownloaded++;
     }
+
+    // set the link's owner as this player (so we can upload it with uploadify)
+    l->setOwner(this);
+
+    // remove the link from the player's vector of links and return it
+    string key = string(1, l->getId());
+    auto linkPtr = move(links[key]);
+    links.erase(key);
+    return linkPtr;
 }
 
-void Player::upload(Link* l, Tile* tile){
-    // 1. mark link as in use
+void Player::upload(unique_ptr<Link> l, Tile* tile){
+    // mark link as in use
     l->setInUse(true);
     
-    // 2. put the link on the appropriate tile
+    // put the link on the appropriate tile
     l->setTile(tile);
 
-    // 3. decrement data/virusAmountDownloaded
+    // decrement data/virusAmountDownloaded
     if (l->getLinkType() == LinkType::DATA) {
         this->dataAmountDownloaded--;
     }
@@ -64,8 +74,11 @@ void Player::upload(Link* l, Tile* tile){
         this->virusAmountDownloaded--;
     }
 
-    //4. make sure the tile knows it has an occupant
-    tile->setOccupant(l);
+    // make sure the tile knows it has an occupant
+    tile->setOccupant(l.get());
+
+    // add the link to the player's vector of links
+    links[string(1, l->getId())] = move(l);
 }
 
 void Player::printAbilities(ostream& out) {
@@ -150,7 +163,7 @@ void Player::reveal(Link* l){
     if (l->getOwner() != this){ // make sure we're not adding to the map if it's your own link
         for (const auto& pair : l->getOwner()->getLinks()) {
             if (pair.second.get() == l) {
-                knownOpponentLinks[l->getOwner()][pair.first] = shared_ptr<Link>(pair.second.get(), [](Link*){});
+                knownOpponentLinks[l->getOwner()][pair.first] = pair.second.get();
                 break;
             }
         }
@@ -170,7 +183,7 @@ Link* Player::getLink(char link) {
     return (it != this->links.end()) ? it->second.get() : nullptr;
 }
 
-map<Player*, map<string, shared_ptr<Link>>>& Player::getKnownOpponentLinks() {
+map<Player*, map<string, Link*>>& Player::getKnownOpponentLinks() {
     return knownOpponentLinks;
 }
 

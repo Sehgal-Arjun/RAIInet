@@ -52,10 +52,11 @@ class Controller {
         void useAbility(Ability& a, Link& l1, Link& l2);
         void useAbility(Ability& a, Player& p, Link& l, Tile& t);
 
-        bool checkGameWon();
+        int checkGameWon();
         void switchTurn();
         bool executeCommand(std::string input);
         void play();
+        void clearViews();
 };
 
 #endif // CONTROLLER_H

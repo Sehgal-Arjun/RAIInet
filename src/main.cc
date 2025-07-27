@@ -178,20 +178,25 @@ int main(int argc, char* argv[]) {
     }
 
     // Create displays for each player perspective
-    TextDisplay* textDisplay1 = new TextDisplay(controller.getBoard(), &players, p1.get(), &controller);
-    TextDisplay* textDisplay2 = new TextDisplay(controller.getBoard(), &players, p2.get(), &controller);
-    controller.addView(textDisplay1);
-    controller.addView(textDisplay2);
+    auto textDisplay1 = make_unique<TextDisplay>(controller.getBoard(), &players, p1.get(), &controller);
+    auto textDisplay2 = make_unique<TextDisplay>(controller.getBoard(), &players, p2.get(), &controller);
+    controller.addView(textDisplay1.get());
+    controller.addView(textDisplay2.get());
 
+    unique_ptr<GraphicDisplay> graphicDisplay1, graphicDisplay2;
     if (useGraphics) {
         cout << "Graphics enabled." << endl;
-        GraphicDisplay* graphicDisplay1 = new GraphicDisplay(board.get(), &players, p1.get(), 8);
-        GraphicDisplay* graphicDisplay2 = new GraphicDisplay(board.get(), &players, p2.get(), 8);
-        controller.addView(graphicDisplay1);
-        controller.addView(graphicDisplay2);
+        graphicDisplay1 = make_unique<GraphicDisplay>(controller.getBoard(), &players, p1.get(), 8);
+        graphicDisplay2 = make_unique<GraphicDisplay>(controller.getBoard(), &players, p2.get(), 8);
+        controller.addView(graphicDisplay1.get());
+        controller.addView(graphicDisplay2.get());
     }
 
     // Start the game
     controller.play();
+
+    // Clear views before objects are destroyed
+    controller.clearViews();  // Add this method to Controller
+
     return 0;
 }

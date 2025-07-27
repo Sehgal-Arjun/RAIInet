@@ -92,15 +92,6 @@ void Board::initialiseBoard(istream& in, vector<Player*> players, const vector<s
     placeLinkVectors(linksP1, linksP2, players);
 }
 
-void Board::placeLink(Link& l, Tile* t) {
-    t->setOccupant(&l);
-    l.setTile(t);
-    auto loc = t->getLocation();
-    int change = (l.getLinkType() == LinkType::DATA) ? 2 : 3; // 2: data, 3: virus
-    notifyObserversCell(loc.first, loc.second, change);
-    notifyObserversFull();
-}
-
 void Board::reveal(Link* l, Player& p) {
     Player* owner = l->getOwner();
     string label;
@@ -115,7 +106,7 @@ void Board::reveal(Link* l, Player& p) {
     }
 
     if (!label.empty() && linkPtr) {
-        p.getKnownOpponentLinks()[owner][label] = shared_ptr<Link>(linkPtr->get(), [](Link*){});
+        p.getKnownOpponentLinks()[owner][label] = linkPtr->get();
     }
 
     if (l->getTile() != nullptr) {

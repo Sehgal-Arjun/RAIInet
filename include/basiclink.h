@@ -13,6 +13,7 @@ enum class LinkType {
 
 class BasicLink : public Link {
 private:
+    char id;
     int strength;
     bool isData;
     bool inUse;
@@ -31,10 +32,14 @@ public:
                                                                         travelDistance{1},
                                                                         place{t} {}
 
+    
+    char getId() const override;
+    void setId(char id) override;
     int getStrength() const override;
     int getTravelDistance() const override;
     LinkType getLinkType() const override;
     Player* getOwner() const override;
+    void setOwner(Player* p) override;
     bool isInUse() const override;
     bool isKnight() const override;
     void setInUse(bool inUse) override;

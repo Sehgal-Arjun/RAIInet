@@ -308,35 +308,32 @@ void Controller::useAbility(Ability& a, Player& p, Link& l, Tile& t){
     }
 }
 
-bool Controller::checkGameWon() {
+int Controller::checkGameWon() {
     for (auto& p : this->players) {
-        if (p->getDataAmountDownloaded() == 4) {
-            p->setHasWon();
-            return true;
+        if (p->getDataAmountDownloaded() >= 4) {
+            return p->getPlayerId();  // Just return, don't modify state
         }
 
-        if (p->getVirusAmountDownloaded() == 4) {
-            p->setHasLost();
+        if (p->getVirusAmountDownloaded() >= 4) {
             int remainingPlayers = players.size();
 
             for (auto& pl : this->players) {
-                if (pl->getHasLost()) {
+                if (pl->getVirusAmountDownloaded() >= 4) {  // Check the actual condition
                     remainingPlayers--;
                 }
             }
 
             if (remainingPlayers == 1) {
                 for (auto& pl : this->players) {
-                    if (!pl->getHasLost()) {
-                        pl->setHasWon();
-                        return true;
+                    if (pl->getVirusAmountDownloaded() < 4) {  // Check the actual condition
+                        return pl->getPlayerId();
                     }
                 }
             }
         }
     }
 
-    return false;
+    return -1;
 }
 
 void Controller::switchTurn() {
@@ -440,13 +437,20 @@ bool Controller::executeCommand(string input){
                 
                 else if (ability->getName() == "Firewall" ) {   
                     // next should be the tile, so should be 0-7, and need another char 0-7
-                    int x = stoi(next);
+                    int x;
                     int y;
-                    stream >> y;
-                    if (x <= 7 && x >= 0 && y <= 7 && y >= 0){
-                        useAbility(*ability, *currentTurn, *board->getTileAt(x, y));
-                    }
-                    else{
+                    try {
+                        x = stoi(next);
+                        stream >> y;
+                        if (x <= 7 && x >= 0 && y <= 7 && y >= 0){
+                            useAbility(*ability, *currentTurn, *board->getTileAt(x, y));
+                        }
+                        else{
+                            cout << "Invalid input!" << endl;
+                        }
+                    } catch (const std::invalid_argument& e) {
+                        cout << "Invalid input!" << endl;
+                    } catch (const std::out_of_range& e) {
                         cout << "Invalid input!" << endl;
                     }
                 }
@@ -478,7 +482,7 @@ bool Controller::executeCommand(string input){
                 else if (ability->getName() == "Uploadify") {
                     // next shoud be a link, followed by the coordinates of a tile
                     char link = next[0];
-                    char x, y;
+                    int x, y;
                     stream >> x >> y;
                     if (((link <= 'h' && link >= 'a') || (link <= 'H' && link >= 'A')) && ((x >= 0 && x <= board->getWidth() - 1) && (y >= 0 && y <= board->getHeight() - 1))){
                         useAbility(*ability, *currentTurn, *getLink(link), *board->getTileAt(x, y));
@@ -505,7 +509,14 @@ bool Controller::executeCommand(string input){
         ifstream file(filename);
         string cmd;
         while(getline(file, cmd)) {
-            executeCommand(cmd);
+            if (!executeCommand(cmd)) {
+                return false;  // If any command says to quit, stop
+            }
+            int winStatus = checkGameWon();
+            if (winStatus != -1) {
+                cout << "Player " << winStatus << " wins!" << endl;
+                return false;  // Game won, stop executing
+            }
         }
     }
 
@@ -524,12 +535,17 @@ void Controller::play(){
             break;
         }
         int winStatus = checkGameWon();
-        if (winStatus != 0) {
-            cout << "Player " << winStatus << " wins!" << endl; 
+        if (winStatus != -1) {
+            cout << "Player " << winStatus << " wins!" << endl;
+            break;
         }
     }
 }
 
 void Controller::setPlayers(const std::vector<Player*>& players) {
     this->players = players;
+}
+
+void Controller::clearViews(){
+    views.clear();
 }

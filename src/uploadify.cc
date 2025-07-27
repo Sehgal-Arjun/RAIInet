@@ -9,7 +9,7 @@ Uploadify::Uploadify(int id): Ability("Uploadify", id) {};
 
 void Uploadify::applyAbility(Link& l, Player& p, Tile& location) {
     // we're sure that l's owner is the caller of uploadify, so we can safely upload the Link
-    p.upload(&l, &location);
+    p.upload(unique_ptr<Link>(&l), &location);
 }
 
 bool Uploadify::isValidUse(Link* l, Player* p, Tile* location) const {

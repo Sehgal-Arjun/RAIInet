@@ -12,7 +12,7 @@ class Player {
     private:
         std::vector<std::unique_ptr<Ability>> chosenAbilities;
         std::map<std::string, std::unique_ptr<Link>> links;
-        std::map<Player*, std::map<std::string, std::shared_ptr<Link>>> knownOpponentLinks;
+        std::map<Player*, std::map<std::string, Link*>> knownOpponentLinks;
         int dataAmountDownloaded = 0;
         int virusAmountDownloaded = 0;
         bool hasWon = false;
@@ -23,8 +23,8 @@ class Player {
         Player(int id) : playerId(id) {}
         ~Player() = default;
         void assignLinks(std::vector<std::unique_ptr<Link>>&& links);
-        void download(Link* l);
-        void upload(Link* l, Tile* t);
+        std::unique_ptr<Link> download(Link* l);
+        void upload(std::unique_ptr<Link> l, Tile* t);
         void printAbilities(std::ostream& out);
         std::vector<std::unique_ptr<Ability>>& getAbilities();
         Ability* getAbility(int id) const;
@@ -36,7 +36,7 @@ class Player {
         int getPlayerId() const;
         std::map<std::string, std::unique_ptr<Link>>& getLinks();
         Link* getLink(char link);
-        std::map<Player*, std::map<std::string, std::shared_ptr<Link>>>& getKnownOpponentLinks();
+        std::map<Player*, std::map<std::string, Link*>>& getKnownOpponentLinks();
         int getDataAmountDownloaded();
         int getVirusAmountDownloaded();
         bool getHasWon();

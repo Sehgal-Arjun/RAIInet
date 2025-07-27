@@ -9,7 +9,10 @@ protected:
 public:
     explicit LinkDecorator(Link* next);
     virtual ~LinkDecorator() = default;
+    char getId() const override;
+    void setId(char id) override;
     Player* getOwner() const override;
+    void setOwner(Player* p) override;
     bool isInUse() const override;
     void setInUse(bool inUse) override;
     LinkType getLinkType() const override;
