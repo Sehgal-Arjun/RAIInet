@@ -121,8 +121,17 @@ void Player::weakenLink(Link* l, int debuffAmount) {
 void Player::knightLink(Link* l) {
     for (auto& pair : links) {
         if (pair.second.get() == l) {
+            // store the tile that the link is currently on
+            Tile* currentTile = l->getTile();
+            
+            // release it so we can make a new one that's knighted
             auto releasedLink = pair.second.release();
             pair.second = make_unique<KnightedLink>(releasedLink);
+            
+            // update the tile's occupant to point to the new decorator
+            if (currentTile) {
+                currentTile->setOccupant(pair.second.get());
+            }
             break;
         }
     }

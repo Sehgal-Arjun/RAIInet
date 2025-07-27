@@ -9,6 +9,7 @@
 #include "../include/firewall.h"
 #include "../include/scan.h"
 #include "../include/polarise.h"
+#include "../include/knightify.h"
 
 #include <vector>
 #include <memory>
