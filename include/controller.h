@@ -10,16 +10,16 @@
 #include "tile.h"
 #include "ability.h"
 #include "view.h"
+#include "subject.h"
 
 class GraphicDisplay;  // Forward declaration
 
-class Controller {
+class Controller : public Subject {
     std::unique_ptr<Board> board;
     std::vector<Player*> players;
     bool useGraphics;
     Player* currentTurn;
     bool abilityUsedThisTurn = false;
-    std::vector<View*> views;
     GraphicDisplay* graphicDisplay;  // Pointer to the single graphic display
     std::pair<int, int> calculateMove(Link* l, std::string direction);
     std::pair<int, int> calculateMove(Link* l, std::string direction1, std::string direction2);

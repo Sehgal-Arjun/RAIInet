@@ -115,6 +115,54 @@ void GraphicDisplay::drawBoard() {
     }
 }
 
+void GraphicDisplay::notify(NotificationType type) {
+    // Respond differently based on notification type
+    switch (type) {
+        case NotificationType::MOVE_MADE:
+            // For moves, we can use partial update optimization
+            needsFullRedraw = false;
+            if (perspective && board) {
+                print(cout);
+            }
+            break;
+            
+        case NotificationType::ABILITY_USED:
+            // Abilities often change link properties, force full redraw
+            needsFullRedraw = true;
+            if (perspective && board) {
+                print(cout);
+            }
+            break;
+            
+        case NotificationType::BATTLE_OCCURRED:
+        case NotificationType::DOWNLOAD_OCCURRED:
+            // Major state changes, force full redraw
+            needsFullRedraw = true;
+            if (perspective && board) {
+                print(cout);
+            }
+            break;
+            
+        case NotificationType::TURN_SWITCHED:
+            // Turn switch may require perspective change, minimal update
+            needsFullRedraw = false;
+            if (perspective && board) {
+                print(cout);
+            }
+            break;
+            
+        case NotificationType::GAME_START:
+        case NotificationType::FULL_UPDATE:
+        default:
+            // Full redraw for these cases
+            needsFullRedraw = true;
+            if (perspective && board) {
+                print(cout);
+            }
+            break;
+    }
+}
+
 void GraphicDisplay::notifyFull() {
     if (perspective && board) {
         print(cout);

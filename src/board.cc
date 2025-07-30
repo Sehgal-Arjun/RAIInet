@@ -107,10 +107,6 @@ void Board::reveal(Link* l, Player& p) {
     if (!label.empty() && linkPtr) {
         p.getKnownOpponentLinks()[owner][label] = linkPtr->get();
     }
-
-    if (l->getTile() != nullptr) {
-        notifyObserversFull();
-    }
 }
 
 vector<unique_ptr<Link>> Board::randomiseLinks(Player* p) {

@@ -87,6 +87,7 @@ void Controller::move(pair<int, int> location, Link& l, Player& p) {
 
         // Store the downloaded link in the player's collection
         p.storeDownloadedLink(std::move(downloadedLink));
+        // No notification here since it's the player's own choice
         return;
     }
 
@@ -335,9 +336,7 @@ void Controller::useAbility(Ability& a, Player& p, Link& l) {
             linkPlayerAbility->apply(l, p);
             a.setUsed(true);
             abilityUsedThisTurn = true;
-            if (graphicDisplay) {
-                graphicDisplay->print(cout);
-            }
+            notify(NotificationType::ABILITY_USED);
         } else {
             cerr << "Error: Invalid Ability: " << a.getName() << endl;
         }
@@ -357,9 +356,7 @@ void Controller::useAbility(Ability& a, Player& p, Tile& t) {
             tilePlayerAbility->apply(t, p);
             a.setUsed(true);
             abilityUsedThisTurn = true;
-            if (graphicDisplay) {
-                graphicDisplay->print(cout);
-            }
+            notify(NotificationType::ABILITY_USED);
         } else {
             cerr << "Error: Invalid Ability: " << a.getName() << endl;
         }
@@ -379,9 +376,7 @@ void Controller::useAbility(Ability& a, Link& l) {
             linkAbility->apply(l);
             a.setUsed(true);
             abilityUsedThisTurn = true;
-            if (graphicDisplay) {
-                graphicDisplay->print(cout);
-            }
+            notify(NotificationType::ABILITY_USED);
         } else {
             cerr << "Error: Invalid Ability: " << a.getName() << endl;
         }
@@ -401,9 +396,7 @@ void Controller::useAbility(Ability& a, Link& l1, Link& l2) {
             linkLinkAbility->apply(l1, l2);
             a.setUsed(true);
             abilityUsedThisTurn = true;
-            if (graphicDisplay) {
-                graphicDisplay->print(cout);
-            }
+            notify(NotificationType::ABILITY_USED);
         } else {
             cerr << "Error: Invalid Ability: " << a.getName() << endl;
         }
@@ -423,9 +416,7 @@ void Controller::useAbility(Ability& a, Player& p, Link& l, Tile& t) {
             linkPlayerTileAbility->apply(l, p, t);
             a.setUsed(true);
             abilityUsedThisTurn = true;
-            if (graphicDisplay) {
-                graphicDisplay->print(cout);
-            }
+            notify(NotificationType::ABILITY_USED);
         } else {
             cerr << "Error: Invalid Ability: " << a.getName() << endl;
         }
@@ -490,8 +481,7 @@ void Controller::switchTurn() {
 }
 
 void Controller::addView(View* v) {
-    views.push_back(v);
-    board->attach(v);
+    attach(v);  // Use Subject's attach method
 }
 
 void Controller::setGraphicDisplay(GraphicDisplay* gd) {
@@ -523,16 +513,18 @@ bool Controller::executeCommand(string input){
             string direction1, direction2;
             stream >> direction1 >> direction2;
             if (makeMove(*link, direction1, direction2, *currentTurn)){
+                notify(NotificationType::MOVE_MADE);
                 switchTurn();
-                board->notifyObserversFull();
+                notify(NotificationType::TURN_SWITCHED);
             }
         }
         else if (link){
             string direction;
             stream >> direction;
             if (makeMove(*link, direction, *currentTurn)){
+                notify(NotificationType::MOVE_MADE);
                 switchTurn();
-                board->notifyObserversFull();
+                notify(NotificationType::TURN_SWITCHED);
             }
         }
     }
@@ -635,7 +627,7 @@ bool Controller::executeCommand(string input){
     }
 
     else if (cmd == "board"){
-        views.at(currentTurn->getPlayerId() - 1)->print(cout);
+        notify(NotificationType::FULL_UPDATE);
         if (graphicDisplay) {
             graphicDisplay->print(cout);
         }
@@ -685,5 +677,5 @@ void Controller::setPlayers(const std::vector<Player*>& players) {
 }
 
 void Controller::clearViews(){
-    views.clear();
+    // Clear all attached observers (this will be called from Subject's destructor anyway)
 }

@@ -10,7 +10,8 @@ class Subject {
 public:
     void attach(View* o);
     void detach(View* o);
-    void notifyObserversFull();
+    void notify(NotificationType type);
+    void notifyObserversFull();  // Keep for backward compatibility
     virtual ~Subject() = default;
 };
 

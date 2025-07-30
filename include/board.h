@@ -3,12 +3,11 @@
 
 #include "tile.h"
 #include "player.h"
-#include "subject.h"
 #include <iostream>
 #include <vector>
 #include <memory>
 
-class Board : public Subject {
+class Board {
     int height, width;
     std::vector<std::vector<std::unique_ptr<Tile>>> grid;
 
