@@ -23,10 +23,10 @@ void Board::initialise(vector<Player*> players) {
         for (int c = 0; c < width; ++c) {
             unique_ptr<Tile> tile = make_unique<Tile>();
             tile->setLocation(make_pair(r, c));
-            row.push_back(std::move(tile));
+            row.push_back(move(tile));
         }
 
-        grid.push_back(std::move(row));
+        grid.push_back(move(row));
     }
 
     grid.at(0).at(width / 2)->enableServerPort();
@@ -39,8 +39,8 @@ void Board::initialise(vector<Player*> players) {
     grid.at(height - 1).at(width / 2 - 1)->setServerPortOwner(players.at(1));
 }
 
-void Board::placeLinkVectors(std::vector<std::unique_ptr<Link>>& linksP1, std::vector<std::unique_ptr<Link>>& linksP2, std::vector<Player*> players) {
-    for (size_t i = 0; i < grid.at(0).size(); i++){  // Changed int to size_t
+void Board::placeLinkVectors(vector<unique_ptr<Link>>& linksP1, vector<unique_ptr<Link>>& linksP2, vector<Player*> players) {
+    for (size_t i = 0; i < grid.at(0).size(); i++){
         int row = 0;
         if (grid.at(0).at(i)->isServerPortTile()){
             row = 1;
@@ -58,14 +58,13 @@ void Board::placeLinkVectors(std::vector<std::unique_ptr<Link>>& linksP1, std::v
         linksP2.at(i)->setTile(grid.at(row).at(i).get());
     }
 
-    players.at(0)->assignLinks(std::move(linksP1));
-    players.at(1)->assignLinks(std::move(linksP2));
+    players.at(0)->assignLinks(move(linksP1));
+    players.at(1)->assignLinks(move(linksP2));
 }
 
 void Board::initialiseBoard(istream& in, vector<Player*> players) {
     initialise(players);
 
-    // for now, only supporting randomised link order
     vector<unique_ptr<Link>> linksP1 = randomiseLinks(players.at(0));
     vector<unique_ptr<Link>> linksP2 = randomiseLinks(players.at(1));
 
@@ -95,7 +94,7 @@ void Board::initialiseBoard(istream& in, vector<Player*> players, const vector<s
 void Board::reveal(Link* l, Player& p) {
     Player* owner = l->getOwner();
     string label;
-    const std::unique_ptr<Link>* linkPtr = nullptr;
+    const unique_ptr<Link>* linkPtr = nullptr;
 
     for (const auto& pair : owner->getLinks()) {
         if (pair.second.get() == l) {
