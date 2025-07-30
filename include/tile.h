@@ -11,7 +11,9 @@ class Tile {
     Player* serverPortOwner;
 
     public:
-        Tile() : isBasic{true}, isFirewall{false}, isServerPort{false} {}
+        Tile() : isBasic{true}, isFirewall{false}, isServerPort{false}, 
+                 occupant{nullptr}, location{0, 0}, firewallOwner{nullptr}, 
+                 serverPortOwner{nullptr} {}
         virtual ~Tile() = default;
 
         bool isBasicTile();

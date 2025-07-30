@@ -6,6 +6,7 @@
 #include "subject.h"
 #include <iostream>
 #include <vector>
+#include <memory>
 
 class Board : public Subject {
     int height, width;

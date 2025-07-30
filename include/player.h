@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <memory>
 #include "link.h"
 #include "ability.h"
 

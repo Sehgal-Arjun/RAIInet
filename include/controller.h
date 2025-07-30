@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 #include "board.h"
 #include "player.h"
 #include "link.h"
