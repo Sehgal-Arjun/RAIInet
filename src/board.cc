@@ -139,14 +139,14 @@ vector<unique_ptr<Link>> Board::createLinksFromOrder(Player* p, const vector<str
     for (int i = 0; i < 8; i++) {
         string linkSpec = linkOrder[i];
         if (linkSpec.length() != 2) {
-            throw invalid_argument("Invalid link specification: " + linkSpec);
+            throw invalid_argument("Error: Invalid link specification: " + linkSpec);
         }
         
         char type = linkSpec[0];
         int strength = linkSpec[1] - '0';
         
         if ((type != 'V' && type != 'D') || strength < 1 || strength > 4) {
-            throw invalid_argument("Invalid link specification: " + linkSpec);
+            throw invalid_argument("Error: Invalid link specification: " + linkSpec);
         }
         
         bool isData = (type == 'D');
