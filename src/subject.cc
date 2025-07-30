@@ -20,3 +20,7 @@ void Subject::notifyObserversFull() {
         if (o) o->notifyFull();
     }
 }
+
+Subject::~Subject() {
+    observers.clear();
+}

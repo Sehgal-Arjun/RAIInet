@@ -12,7 +12,7 @@ public:
     void detach(View* o);
     void notify(NotificationType type);
     void notifyObserversFull();  // Keep for backward compatibility
-    virtual ~Subject() = default;
+    virtual ~Subject() = 0;
 };
 
 #endif
