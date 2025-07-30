@@ -20,8 +20,23 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <map>
 
 using namespace std;
+
+bool validateAbilityOrder(const string& abilityOrder, int playerNum) {
+    map<char, int> abilityCount;
+    
+    for (char c : abilityOrder) {
+        abilityCount[c]++;
+        if (abilityCount[c] > 2) {
+            cerr << "Error: Player " << playerNum << " has more than 2 of ability '" << c << "'" << endl;
+            return false;
+        }
+    }
+    
+    return true;
+}
 
 int main(int argc, char* argv[]) {
     // Default ability orders (LinkBoost, Firewall, Download, Scan, Polarize)
@@ -83,7 +98,10 @@ int main(int argc, char* argv[]) {
         cerr << "Error: Player 2 ability order must contain exactly 5 characters" << endl;
         return 1;
     }
-
+    
+    if (!validateAbilityOrder(ability1Order, 1)) { return 1; }
+    if (!validateAbilityOrder(ability2Order, 2)) { return 1; }
+    
     // Read link placement files if provided
     vector<string> link1Order, link2Order;
     

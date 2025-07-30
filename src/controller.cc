@@ -195,7 +195,7 @@ bool Controller::checkValidMove(Link* l, pair<int, int> location) {
 
 bool Controller::makeMove(Link& l, const std::string direction, Player& p) {
     if (!isValidMove(&l, direction)) {
-        cout << "INVALID MOVE" << endl;
+        cerr << "Error: Invalid move" << endl;
         return false;
     }
 
@@ -205,7 +205,7 @@ bool Controller::makeMove(Link& l, const std::string direction, Player& p) {
 
 bool Controller::makeMove(Link& l, const std::string directionFirst, const std::string directionSecond, Player& p) {
     if (!isValidMove(&l, directionFirst, directionSecond)) {
-        cout << "INVALID MOVE" << endl;
+        cerr << "Error: Invalid move" << endl;
         return false;
     }
 
@@ -325,86 +325,112 @@ bool Controller::isMoveIntoOpponentFirewall(Tile* t) {
 
 // useAbility for Download, Scan, Weakenify, and LinkBoost
 void Controller::useAbility(Ability& a, Player& p, Link& l) {
+    if (abilityUsedThisTurn) {
+        cout << "Error: You can only use one ability per turn!" << endl;
+        return;
+    }
+    
     if (auto* linkPlayerAbility = dynamic_cast<LinkPlayerAbility*>(&a)) {
         if (linkPlayerAbility->isValid(&l, &p)) {
             linkPlayerAbility->apply(l, p);
             a.setUsed(true);
+            abilityUsedThisTurn = true;
             if (graphicDisplay) {
                 graphicDisplay->print(cout);
             }
         } else {
-            cout << "INVALID ABILITY: " << a.getName() << endl;
+            cerr << "Error: Invalid Ability: " << a.getName() << endl;
         }
     } else {
-        cout << "INVALID ABILITY: " << a.getName() << endl;
+        cerr << "Error: Invalid Ability: " << a.getName() << endl;
     }
 }
 
 // useAbility for Firewall
 void Controller::useAbility(Ability& a, Player& p, Tile& t) {
+    if (abilityUsedThisTurn) {
+        cout << "Error: You can only use one ability per turn!" << endl;
+        return;
+    }
     if (auto* tilePlayerAbility = dynamic_cast<TilePlayerAbility*>(&a)) {
         if (tilePlayerAbility->isValid(&t)) {
             tilePlayerAbility->apply(t, p);
             a.setUsed(true);
+            abilityUsedThisTurn = true;
             if (graphicDisplay) {
                 graphicDisplay->print(cout);
             }
         } else {
-            cout << "INVALID ABILITY: " << a.getName() << endl;
+            cerr << "Error: Invalid Ability: " << a.getName() << endl;
         }
     } else {
-        cout << "INVALID ABILITY: " << a.getName() << endl;
+        cerr << "Error: Invalid Ability: " << a.getName() << endl;
     }
 }
 
 // useAbility for Knightify and Polarise
 void Controller::useAbility(Ability& a, Link& l) {
+    if (abilityUsedThisTurn) {
+        cout << "Error: You can only use one ability per turn!" << endl;
+        return;
+    }
     if (auto* linkAbility = dynamic_cast<LinkAbility*>(&a)) {
         if (linkAbility->isValid(&l)) {
             linkAbility->apply(l);
             a.setUsed(true);
+            abilityUsedThisTurn = true;
             if (graphicDisplay) {
                 graphicDisplay->print(cout);
             }
         } else {
-            cout << "INVALID ABILITY: " << a.getName() << endl;
+            cerr << "Error: Invalid Ability: " << a.getName() << endl;
         }
     } else {
-        cout << "INVALID ABILITY: " << a.getName() << endl;
+        cerr << "Error: Invalid Ability: " << a.getName() << endl;
     }
 }
 
 // useAbility for Tradeify
 void Controller::useAbility(Ability& a, Link& l1, Link& l2) {
+    if (abilityUsedThisTurn) {
+        cout << "Error: You can only use one ability per turn!" << endl;
+        return;
+    }
     if (auto* linkLinkAbility = dynamic_cast<LinkLinkAbility*>(&a)) {
         if (linkLinkAbility->isValid(&l1, &l2)) {
             linkLinkAbility->apply(l1, l2);
             a.setUsed(true);
+            abilityUsedThisTurn = true;
             if (graphicDisplay) {
                 graphicDisplay->print(cout);
             }
         } else {
-            cout << "INVALID ABILITY: " << a.getName() << endl;
+            cerr << "Error: Invalid Ability: " << a.getName() << endl;
         }
     } else {
-        cout << "INVALID ABILITY: " << a.getName() << endl;
+        cerr << "Error: Invalid Ability: " << a.getName() << endl;
     }
 }
 
 // useAbility for Uploadify
 void Controller::useAbility(Ability& a, Player& p, Link& l, Tile& t) {
+    if (abilityUsedThisTurn) {
+        cout << "Error: You can only use one ability per turn!" << endl;
+        return;
+    }
     if (auto* linkPlayerTileAbility = dynamic_cast<LinkPlayerTileAbility*>(&a)) {
         if (linkPlayerTileAbility->isValid(&l, &p, &t)) {
             linkPlayerTileAbility->apply(l, p, t);
             a.setUsed(true);
+            abilityUsedThisTurn = true;
             if (graphicDisplay) {
                 graphicDisplay->print(cout);
             }
         } else {
-            cout << "INVALID ABILITY: " << a.getName() << endl;
+            cerr << "Error: Invalid Ability: " << a.getName() << endl;
         }
     } else {
-        cout << "INVALID ABILITY: " << a.getName() << endl;
+        cerr << "Error: Invalid Ability: " << a.getName() << endl;
     }
 }
 
@@ -459,6 +485,8 @@ void Controller::switchTurn() {
     if (graphicDisplay) {
         graphicDisplay->setPerspective(currentTurn);
     }
+
+    abilityUsedThisTurn = false;
 }
 
 void Controller::addView(View* v) {
@@ -518,11 +546,11 @@ bool Controller::executeCommand(string input){
         stream >> id;
         Ability* ability = currentTurn->getAbility(id);
         if (ability == nullptr) {
-            cout << "Invalid ability ID!" << endl;
+            cerr << "Error: Invalid ability ID!" << endl;
         }
         else {
             if (ability->isUsed()){
-                cout << "Ability already used!" << endl;
+                cerr << "Error: Ability already used!" << endl;
             }
             else {
                 string next;
@@ -538,7 +566,7 @@ bool Controller::executeCommand(string input){
                         useAbility(*ability, *currentTurn, *getLink(link));
                     }
                     else{
-                        cout << "Invalid input!" << endl;
+                        cerr << "Error: Invalid input! " << endl;
                     }
                 }
                 
@@ -553,12 +581,12 @@ bool Controller::executeCommand(string input){
                             useAbility(*ability, *currentTurn, *board->getTileAt(x, y));
                         }
                         else{
-                            cout << "Invalid input!" << endl;
+                            cerr << "Error: Invalid input! " << endl;
                         }
                     } catch (const std::invalid_argument& e) {
-                        cout << "Invalid input!" << endl;
+                        cerr << "Error: Invalid input! " << endl;
                     } catch (const std::out_of_range& e) {
-                        cout << "Invalid input!" << endl;
+                        cerr << "Error: Invalid input! " << endl;
                     }
                 }
 
@@ -569,7 +597,7 @@ bool Controller::executeCommand(string input){
                         useAbility(*ability, *getLink(link));
                     }
                     else{
-                        cout << "Invalid input!" << endl;
+                        cerr << "Error: Invalid input! " << endl;
                     }
                 }
 
@@ -582,7 +610,7 @@ bool Controller::executeCommand(string input){
                         useAbility(*ability, *getLink(link1), *getLink(link2));
                     }
                     else{
-                        cout << "Invalid input!" << endl;
+                        cerr << "Error: Invalid input! " << endl;
                     }
                 }
 
@@ -595,12 +623,12 @@ bool Controller::executeCommand(string input){
                         useAbility(*ability, *currentTurn, *getLink(link), *board->getTileAt(x, y));
                     }
                     else {
-                        cout << "Invalid input!" << endl;
+                        cerr << "Error: Invalid input! " << endl;
                     }
                 }
 
                 else {
-                    cout << "Invalid ability! Name not found!" << endl;
+                    cerr << "Error: Ability name not found!" << endl;
                 }
             }
         }
