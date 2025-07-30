@@ -9,6 +9,13 @@ using namespace std;
 TextDisplay::TextDisplay(Board* b, vector<Player*>* ps, Player* persp, Controller* ctrl)
     : board(b), players(ps), perspective(persp), controller(ctrl) {}
 
+void TextDisplay::notify(NotificationType type) {
+    // TextDisplay responds to all notification types the same way
+    if (controller && controller->getCurrentTurn() == perspective) {
+        print(cout);
+    }
+}
+
 void TextDisplay::notifyFull() {
     // Only print if this display's perspective matches the current turn
     if (controller && controller->getCurrentTurn() == perspective) {
