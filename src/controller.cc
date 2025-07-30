@@ -169,7 +169,7 @@ bool Controller::checkValidMove(Link* l, pair<int, int> location) {
 
 bool Controller::makeMove(Link& l, const std::string direction, Player& p) {
     if (!isValidMove(&l, direction)) {
-        cout << "INVALID MOVE" << endl;
+        cerr << "Error: Invalid move" << endl;
         return false;
     }
 
@@ -179,7 +179,7 @@ bool Controller::makeMove(Link& l, const std::string direction, Player& p) {
 
 bool Controller::makeMove(Link& l, const std::string directionFirst, const std::string directionSecond, Player& p) {
     if (!isValidMove(&l, directionFirst, directionSecond)) {
-        cout << "INVALID MOVE" << endl;
+        cerr << "Error: Invalid move" << endl;
         return false;
     }
 
@@ -313,10 +313,10 @@ void Controller::useAbility(Ability& a, Player& p, Link& l) {
                 graphicDisplay->print(cout);
             }
         } else {
-            cout << "INVALID ABILITY: " << a.getName() << endl;
+            cerr << "Error: Invalid Ability: " << a.getName() << endl;
         }
     } else {
-        cout << "INVALID ABILITY: " << a.getName() << endl;
+        cerr << "Error: Invalid Ability: " << a.getName() << endl;
     }
 }
 
@@ -335,10 +335,10 @@ void Controller::useAbility(Ability& a, Player& p, Tile& t) {
                 graphicDisplay->print(cout);
             }
         } else {
-            cout << "INVALID ABILITY: " << a.getName() << endl;
+            cerr << "Error: Invalid Ability: " << a.getName() << endl;
         }
     } else {
-        cout << "INVALID ABILITY: " << a.getName() << endl;
+        cerr << "Error: Invalid Ability: " << a.getName() << endl;
     }
 }
 
@@ -357,10 +357,10 @@ void Controller::useAbility(Ability& a, Link& l) {
                 graphicDisplay->print(cout);
             }
         } else {
-            cout << "INVALID ABILITY: " << a.getName() << endl;
+            cerr << "Error: Invalid Ability: " << a.getName() << endl;
         }
     } else {
-        cout << "INVALID ABILITY: " << a.getName() << endl;
+        cerr << "Error: Invalid Ability: " << a.getName() << endl;
     }
 }
 
@@ -379,10 +379,10 @@ void Controller::useAbility(Ability& a, Link& l1, Link& l2) {
                 graphicDisplay->print(cout);
             }
         } else {
-            cout << "INVALID ABILITY: " << a.getName() << endl;
+            cerr << "Error: Invalid Ability: " << a.getName() << endl;
         }
     } else {
-        cout << "INVALID ABILITY: " << a.getName() << endl;
+        cerr << "Error: Invalid Ability: " << a.getName() << endl;
     }
 }
 
@@ -401,10 +401,10 @@ void Controller::useAbility(Ability& a, Player& p, Link& l, Tile& t) {
                 graphicDisplay->print(cout);
             }
         } else {
-            cout << "INVALID ABILITY: " << a.getName() << endl;
+            cerr << "Error: Invalid Ability: " << a.getName() << endl;
         }
     } else {
-        cout << "INVALID ABILITY: " << a.getName() << endl;
+        cerr << "Error: Invalid Ability: " << a.getName() << endl;
     }
 }
 
@@ -520,11 +520,11 @@ bool Controller::executeCommand(string input){
         stream >> id;
         Ability* ability = currentTurn->getAbility(id);
         if (ability == nullptr) {
-            cout << "Invalid ability ID!" << endl;
+            cerr << "Error: Invalid ability ID!" << endl;
         }
         else {
             if (ability->isUsed()){
-                cout << "Ability already used!" << endl;
+                cerr << "Error: Ability already used!" << endl;
             }
             else {
                 string next;
@@ -540,7 +540,7 @@ bool Controller::executeCommand(string input){
                         useAbility(*ability, *currentTurn, *getLink(link));
                     }
                     else{
-                        cout << "Invalid input!" << endl;
+                        cerr << "Error: Invalid input! " << endl;
                     }
                 }
                 
@@ -555,12 +555,12 @@ bool Controller::executeCommand(string input){
                             useAbility(*ability, *currentTurn, *board->getTileAt(x, y));
                         }
                         else{
-                            cout << "Invalid input!" << endl;
+                            cerr << "Error: Invalid input! " << endl;
                         }
                     } catch (const std::invalid_argument& e) {
-                        cout << "Invalid input!" << endl;
+                        cerr << "Error: Invalid input! " << endl;
                     } catch (const std::out_of_range& e) {
-                        cout << "Invalid input!" << endl;
+                        cerr << "Error: Invalid input! " << endl;
                     }
                 }
 
@@ -571,7 +571,7 @@ bool Controller::executeCommand(string input){
                         useAbility(*ability, *getLink(link));
                     }
                     else{
-                        cout << "Invalid input!" << endl;
+                        cerr << "Error: Invalid input! " << endl;
                     }
                 }
 
@@ -584,7 +584,7 @@ bool Controller::executeCommand(string input){
                         useAbility(*ability, *getLink(link1), *getLink(link2));
                     }
                     else{
-                        cout << "Invalid input!" << endl;
+                        cerr << "Error: Invalid input! " << endl;
                     }
                 }
 
@@ -597,12 +597,12 @@ bool Controller::executeCommand(string input){
                         useAbility(*ability, *currentTurn, *getLink(link), *board->getTileAt(x, y));
                     }
                     else {
-                        cout << "Invalid input!" << endl;
+                        cerr << "Error: Invalid input! " << endl;
                     }
                 }
 
                 else {
-                    cout << "Invalid ability! Name not found!" << endl;
+                    cerr << "Error: Ability name not found!" << endl;
                 }
             }
         }

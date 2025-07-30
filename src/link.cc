@@ -14,6 +14,6 @@ string Link::makeString() {
         return "V" + strength;
     }
     else {
-        return "ERROR";
+        return "Error: Unrecognised LinkType";
     }
 }

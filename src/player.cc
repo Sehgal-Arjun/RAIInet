@@ -20,7 +20,7 @@ void Player::assignLinks(std::vector<std::unique_ptr<Link>>&& ls){
         key = 'A';
     }
     else{
-        cout << "ERROR! invalid playerId!" << endl;
+        cerr << "Error: Invalid playerId" << endl;
         return;
     }
 
