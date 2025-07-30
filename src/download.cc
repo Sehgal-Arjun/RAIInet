@@ -5,9 +5,9 @@
 
 using namespace std;
 
-Download::Download(int id): Ability("Download", id) {}
+Download::Download(int id): LinkPlayerAbility("Download", id) {}
 
-void Download::applyAbility(Link& l, Player& p) {
+void Download::apply(Link& l, Player& p) {
     // Get the current owner of the link
     Player* currentOwner = l.getOwner();
     // Remove the link from the current owner's map (without updating download counters)
@@ -26,43 +26,7 @@ void Download::applyAbility(Link& l, Player& p) {
     p.storeDownloadedLink(move(downloadedLink));
 }
 
-bool Download::isValidUse(Link* l, Player* p) const {
+bool Download::isValid(Link* l, Player* p) const {
     // can only download an opponents link!
     return (l->getOwner() != p);
-}
-
-void Download::applyAbility(Link& l) {
-    // Empty implementation
-}
-
-void Download::applyAbility(Tile& t, Player& p) {
-    // Empty implementation
-}
-
-void Download::applyAbility(Link& l1, Link& l2) {
-    // Empty implementation
-}
-
-void Download::applyAbility(Link& l, Player& p, Tile& location) {
-    // Empty implementation
-}
-
-bool Download::isValidUse(Link* l) const {
-    // Empty implementation
-    return false;
-}
-
-bool Download::isValidUse(Link* l1, Link* l2) const {
-    // Empty implementation
-    return false;
-}
-
-bool Download::isValidUse(Tile* t) const {
-    // Empty implementation
-    return false;
-}
-
-bool Download::isValidUse(Link* l, Player* p, Tile* location) const {
-    // Empty implementation
-    return false;
 }
