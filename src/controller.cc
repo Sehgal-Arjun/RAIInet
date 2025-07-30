@@ -78,21 +78,39 @@ std::pair<int, int> Controller::calculateMove(Link* l, std::string direction1, s
 void Controller::move(pair<int, int> location, Link& l, Player& p) {
     int row = location.first;
     int col = location.second;
+    int height = board->getHeight();
+
+    // Check if moving off opponent's edge
+    if ((p.getPlayerId() == 1 && row >= height) || (p.getPlayerId() == 2 && row < 0)) {
+        // Player downloads their own link
+        auto downloadedLink = p.download(&l);
+        
+        // Store the downloaded link in the player's collection
+        p.storeDownloadedLink(std::move(downloadedLink));
+        return;
+    }
 
     Tile* destination = board->getTileAt(row, col);
 
     // if moving onto a firewall tile that isn't yours
     if (destination->isFirewallTile() && destination->getFirewallOwner() != &p) {
         // reveal to all players
-        for (auto& p : this->players) {
-            p->reveal(&l);
+        for (auto& player : this->players) {
+            player->reveal(&l);
         }
         
-        // if it's a virus, then download it
+        // if it's a virus, then download it to the firewall owner
         if (l.getLinkType() == LinkType::VIRUS) {
-            l.getOwner()->download(&l);
-            return;
+            auto downloadedLink = l.getOwner()->download(&l);
+            
+            // Update download counters for the firewall owner
+            Player* firewallOwner = destination->getFirewallOwner();
+            firewallOwner->incrementVirusDownloaded();
+            
+            // Store the downloaded link in the firewall owner's collection
+            firewallOwner->storeDownloadedLink(std::move(downloadedLink));
         }
+        return;
     }
     
     // if moving onto tile which has a link that isn't yours
@@ -139,17 +157,27 @@ bool Controller::checkValidMove(Link* l, pair<int, int> location) {
         return false;
     }
 
+    // Allow moves off opponent's edge (for downloading), but not off own edge
     if (currentTurn->getPlayerId() == 1) {
-        if (row < 0) {
+        if (row < 0) {  // Player 1 can't move off their own edge (top)
             return false;
         }
+        // Player 1 CAN move off bottom edge (row >= height) - opponent's edge
     }
     else if (currentTurn->getPlayerId() == 2) {
-        if (row >= height) {
+        if (row >= height) {  // Player 2 can't move off their own edge (bottom)
             return false;
         }
+        // Player 2 CAN move off top edge (row < 0) - opponent's edge
     }
 
+    // If moving off opponent's edge, it's valid (handled in move method)
+    if ((currentTurn->getPlayerId() == 1 && row >= height) || 
+        (currentTurn->getPlayerId() == 2 && row < 0)) {
+        return true;
+    }
+
+    // For normal moves on the board, check destination tile
     Tile* destination = board->getTileAt(row, col);
     if (!destination) {
         return false;
