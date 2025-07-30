@@ -84,7 +84,7 @@ void Controller::move(pair<int, int> location, Link& l, Player& p) {
     if ((p.getPlayerId() == 1 && row >= height) || (p.getPlayerId() == 2 && row < 0)) {
         // Player downloads their own link
         auto downloadedLink = p.download(&l);
-        
+
         // Store the downloaded link in the player's collection
         p.storeDownloadedLink(std::move(downloadedLink));
         return;
@@ -142,8 +142,6 @@ void Controller::move(pair<int, int> location, Link& l, Player& p) {
         serverOwner->storeDownloadedLink(std::move(downloadedLink));
         return;
     }
-
-    // Don't notify observers here - will be done after turn switch
 }
 
 bool Controller::checkValidMove(Link* l, pair<int, int> location) {
