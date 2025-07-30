@@ -14,3 +14,5 @@ string Ability::getName() const { return name; }
 void Ability::setUsed(bool used) {
     this->used = used;
 }
+
+Ability::~Ability() {}

@@ -15,7 +15,7 @@ class Ability {
         Ability(const std::string& name, int id);
         
     public:
-        virtual ~Ability() = default;
+        virtual ~Ability() = 0;
         
         // interface for all abilities
         int getID() const;
