@@ -326,10 +326,16 @@ bool Controller::isMoveIntoOpponentFirewall(Tile* t) {
 
 // useAbility for Download, Scan, Weakenify, and LinkBoost
 void Controller::useAbility(Ability& a, Player& p, Link& l) {
+    if (abilityUsedThisTurn) {
+        cout << "Error: You can only use one ability per turn!" << endl;
+        return;
+    }
+    
     if (auto* linkPlayerAbility = dynamic_cast<LinkPlayerAbility*>(&a)) {
         if (linkPlayerAbility->isValid(&l, &p)) {
             linkPlayerAbility->apply(l, p);
             a.setUsed(true);
+            abilityUsedThisTurn = true;
             notify(NotificationType::ABILITY_USED);
         } else {
             cout << "INVALID ABILITY: " << a.getName() << endl;
@@ -341,10 +347,15 @@ void Controller::useAbility(Ability& a, Player& p, Link& l) {
 
 // useAbility for Firewall
 void Controller::useAbility(Ability& a, Player& p, Tile& t) {
+    if (abilityUsedThisTurn) {
+        cout << "Error: You can only use one ability per turn!" << endl;
+        return;
+    }
     if (auto* tilePlayerAbility = dynamic_cast<TilePlayerAbility*>(&a)) {
         if (tilePlayerAbility->isValid(&t)) {
             tilePlayerAbility->apply(t, p);
             a.setUsed(true);
+            abilityUsedThisTurn = true;
             notify(NotificationType::ABILITY_USED);
         } else {
             cout << "INVALID ABILITY: " << a.getName() << endl;
@@ -356,10 +367,15 @@ void Controller::useAbility(Ability& a, Player& p, Tile& t) {
 
 // useAbility for Knightify and Polarise
 void Controller::useAbility(Ability& a, Link& l) {
+    if (abilityUsedThisTurn) {
+        cout << "Error: You can only use one ability per turn!" << endl;
+        return;
+    }
     if (auto* linkAbility = dynamic_cast<LinkAbility*>(&a)) {
         if (linkAbility->isValid(&l)) {
             linkAbility->apply(l);
             a.setUsed(true);
+            abilityUsedThisTurn = true;
             notify(NotificationType::ABILITY_USED);
         } else {
             cout << "INVALID ABILITY: " << a.getName() << endl;
@@ -371,10 +387,15 @@ void Controller::useAbility(Ability& a, Link& l) {
 
 // useAbility for Tradeify
 void Controller::useAbility(Ability& a, Link& l1, Link& l2) {
+    if (abilityUsedThisTurn) {
+        cout << "Error: You can only use one ability per turn!" << endl;
+        return;
+    }
     if (auto* linkLinkAbility = dynamic_cast<LinkLinkAbility*>(&a)) {
         if (linkLinkAbility->isValid(&l1, &l2)) {
             linkLinkAbility->apply(l1, l2);
             a.setUsed(true);
+            abilityUsedThisTurn = true;
             notify(NotificationType::ABILITY_USED);
         } else {
             cout << "INVALID ABILITY: " << a.getName() << endl;
@@ -386,10 +407,15 @@ void Controller::useAbility(Ability& a, Link& l1, Link& l2) {
 
 // useAbility for Uploadify
 void Controller::useAbility(Ability& a, Player& p, Link& l, Tile& t) {
+    if (abilityUsedThisTurn) {
+        cout << "Error: You can only use one ability per turn!" << endl;
+        return;
+    }
     if (auto* linkPlayerTileAbility = dynamic_cast<LinkPlayerTileAbility*>(&a)) {
         if (linkPlayerTileAbility->isValid(&l, &p, &t)) {
             linkPlayerTileAbility->apply(l, p, t);
             a.setUsed(true);
+            abilityUsedThisTurn = true;
             notify(NotificationType::ABILITY_USED);
         } else {
             cout << "INVALID ABILITY: " << a.getName() << endl;
@@ -450,6 +476,8 @@ void Controller::switchTurn() {
     if (graphicDisplay) {
         graphicDisplay->setPerspective(currentTurn);
     }
+
+    abilityUsedThisTurn = false;
 }
 
 void Controller::addView(View* v) {

@@ -19,6 +19,7 @@ class Controller : public Subject {
     std::vector<Player*> players;
     bool useGraphics;
     Player* currentTurn;
+    bool abilityUsedThisTurn = false;
     GraphicDisplay* graphicDisplay;  // Pointer to the single graphic display
     std::pair<int, int> calculateMove(Link* l, std::string direction);
     std::pair<int, int> calculateMove(Link* l, std::string direction1, std::string direction2);
