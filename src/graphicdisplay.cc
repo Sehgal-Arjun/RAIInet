@@ -127,8 +127,7 @@ void GraphicDisplay::notify(NotificationType type) {
             break;
             
         case NotificationType::ABILITY_USED:
-            // Abilities often change link properties, force full redraw
-            needsFullRedraw = true;
+            needsFullRedraw = false;
             if (perspective && board) {
                 print(cout);
             }
@@ -136,8 +135,7 @@ void GraphicDisplay::notify(NotificationType type) {
             
         case NotificationType::BATTLE_OCCURRED:
         case NotificationType::DOWNLOAD_OCCURRED:
-            // Major state changes, force full redraw
-            needsFullRedraw = true;
+            needsFullRedraw = false;
             if (perspective && board) {
                 print(cout);
             }
