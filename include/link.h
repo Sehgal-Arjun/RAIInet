@@ -2,6 +2,7 @@
 #define LINK_H
 
 #include <utility>
+#include <string>
 
 class Tile;
 class Player;

@@ -20,7 +20,6 @@ void TextDisplay::print(ostream& out) {
     Player* p1 = (*players)[0];
     Player* p2 = (*players)[1];
     Player* pov = perspective;
-    Player* opp = (pov == p1) ? p2 : p1;
 
     // --- Player 1 Header ---
     out << "Player 1:\n";

@@ -39,8 +39,8 @@ void Board::initialise(vector<Player*> players) {
     grid.at(height - 1).at(width / 2 - 1)->setServerPortOwner(players.at(1));
 }
 
-void Board::placeLinkVectors(vector<unique_ptr<Link>>& linksP1, vector<unique_ptr<Link>>& linksP2, vector<Player*> players) {
-    for (int i = 0; i < grid.at(0).size(); i++){
+void Board::placeLinkVectors(std::vector<std::unique_ptr<Link>>& linksP1, std::vector<std::unique_ptr<Link>>& linksP2, std::vector<Player*> players) {
+    for (size_t i = 0; i < grid.at(0).size(); i++){  // Changed int to size_t
         int row = 0;
         if (grid.at(0).at(i)->isServerPortTile()){
             row = 1;
@@ -49,7 +49,7 @@ void Board::placeLinkVectors(vector<unique_ptr<Link>>& linksP1, vector<unique_pt
         linksP1.at(i)->setTile(grid.at(row).at(i).get());
     }
 
-    for (int i = 0; i < grid.at(height-1).size(); i++){
+    for (size_t i = 0; i < grid.at(height-1).size(); i++){
         int row = height - 1;
         if (grid.at(row).at(i)->isServerPortTile()){
             row = height - 2;
@@ -110,8 +110,6 @@ void Board::reveal(Link* l, Player& p) {
     }
 
     if (l->getTile() != nullptr) {
-        auto loc = l->getTile()->getLocation();
-        int change = (l->getLinkType() == LinkType::DATA) ? 2 : 3;
         notifyObserversFull();
     }
 }
