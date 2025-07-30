@@ -9,10 +9,6 @@ using namespace std;
 TextDisplay::TextDisplay(Board* b, vector<Player*>* ps, Player* persp, Controller* ctrl)
     : board(b), players(ps), perspective(persp), controller(ctrl) {}
 
-void TextDisplay::notifyCell(int r, int c, int change) {
-    // Empty for now
-}
-
 void TextDisplay::notifyFull() {
     // Only print if this display's perspective matches the current turn
     if (controller && controller->getCurrentTurn() == perspective) {

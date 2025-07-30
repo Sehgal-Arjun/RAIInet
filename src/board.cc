@@ -112,7 +112,6 @@ void Board::reveal(Link* l, Player& p) {
     if (l->getTile() != nullptr) {
         auto loc = l->getTile()->getLocation();
         int change = (l->getLinkType() == LinkType::DATA) ? 2 : 3;
-        notifyObserversCell(loc.first, loc.second, change);
         notifyObserversFull();
     }
 }

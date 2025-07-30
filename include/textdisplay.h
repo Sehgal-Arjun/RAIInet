@@ -15,7 +15,6 @@ class TextDisplay : public View {
     Controller* controller; // to access current turn
 public:
     TextDisplay(Board* b, std::vector<Player*>* ps, Player* persp, Controller* ctrl);
-    void notifyCell(int r, int c, int change) override;
     void notifyFull() override;
     void print(std::ostream& out) override;
 };

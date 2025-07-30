@@ -18,7 +18,6 @@ class GraphicDisplay : public View {
 public:
     GraphicDisplay(Board* b, std::vector<Player*>* ps, Player* persp, int n);
     ~GraphicDisplay();
-    void notifyCell(int row, int col, int change) override;
     void notifyFull() override;
     void print(std::ostream &out) override;
     void setPerspective(Player* newPerspective);  // Add method to change perspective
