@@ -2,14 +2,14 @@
 #define SUBJECT_H
 
 #include <vector>
-#include "observer.h"
+#include "view.h"
 
 class Subject {
-    std::vector<Observer*> observers;
+    std::vector<View*> observers;
 
 public:
-    void attach(Observer* o);
-    void detach(Observer* o);
+    void attach(View* o);
+    void detach(View* o);
     void notifyObserversFull();
     virtual ~Subject() = default;
 };
