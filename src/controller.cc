@@ -82,12 +82,17 @@ void Controller::move(pair<int, int> location, Link& l, Player& p) {
 
     // Check if moving off opponent's edge
     if ((p.getPlayerId() == 1 && row >= height) || (p.getPlayerId() == 2 && row < 0)) {
-        // Player downloads their own link
-        auto downloadedLink = p.download(&l);
-
-        // Store the downloaded link in the player's collection
+        auto downloadedLink = l.getOwner()->download(&l);
+        
+        // Update download counters for the player who moved off opponent's edge
+        if (l.getLinkType() == LinkType::DATA) {
+            p.incrementDataDownloaded();
+        } else if (l.getLinkType() == LinkType::VIRUS) {
+            p.incrementVirusDownloaded();
+        }
+        
+        // Store the downloaded link in the moving player's vector
         p.storeDownloadedLink(std::move(downloadedLink));
-        // No notification here since it's the player's own choice
         return;
     }
 

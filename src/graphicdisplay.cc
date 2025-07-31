@@ -127,7 +127,7 @@ void GraphicDisplay::notify(NotificationType type) {
             break;
             
         case NotificationType::ABILITY_USED:
-            needsFullRedraw = false;
+            needsFullRedraw = true;
             if (perspective && board) {
                 print(cout);
             }
@@ -340,13 +340,13 @@ void GraphicDisplay::updatePlayerInfo(Player* player) {
         
         if (dataChanged || virusChanged) {
             // Clear and redraw only the downloaded line
-            xw.fillRectangle(10, yOffset + 15, 480, 20, Xwindow::White);
+            xw.fillRectangle(10, yOffset + 10, 480, 20, Xwindow::White);
             xw.drawString(10, yOffset + 20, "Downloaded: " + to_string(currentData) + "D, " + to_string(currentVirus) + "V");
         }
         
         if (abilitiesChanged) {
             // Clear and redraw only the abilities line
-            xw.fillRectangle(10, yOffset + 35, 480, 20, Xwindow::White);
+            xw.fillRectangle(10, yOffset + 30, 480, 20, Xwindow::White);
             xw.drawString(10, yOffset + 40, "Abilities: " + to_string(currentAbilities));
         }
     }
