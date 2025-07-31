@@ -383,9 +383,8 @@ std::pair<std::string, int> GraphicDisplay::getLinkDisplayInfo(Link* link, Playe
             return {cellText, colour};
         }
     } else {
-        // Opponent's link - always show the letter, but color depends on if revealed
+        // Opponent's link - just show the letter
         auto known = perspective->getKnownOpponentLinks().find(owner);
-        bool isRevealed = false;
         
         // First, find the letter for this link
         for (const auto& pair : owner->getLinks()) {
@@ -405,22 +404,7 @@ std::pair<std::string, int> GraphicDisplay::getLinkDisplayInfo(Link* link, Playe
             }
         }
         
-        // Check if this link is revealed to determine color
-        if (known != perspective->getKnownOpponentLinks().end()) {
-            for (const auto& pair : known->second) {
-                if (pair.second == link) {
-                    isRevealed = true;
-                    colour = (link->getLinkType() == LinkType::DATA) ? Xwindow::Green : Xwindow::Red;
-                    break;
-                }
-            }
-        }
-        
-        if (!isRevealed) {
-            colour = Xwindow::Black; // Unknown links are black with white text
-        }
-        
-        return {cellText, colour};
+        return {cellText,  Xwindow::Black};
     }
     
     return {"?", Xwindow::Black};
