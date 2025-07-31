@@ -25,6 +25,9 @@ class Xwindow {
 
   // Draws a string
   void drawString(int x, int y, std::string msg);
+  
+  // Draws a string with specified color
+  void drawString(int x, int y, std::string msg, int colour);
 
 };
 

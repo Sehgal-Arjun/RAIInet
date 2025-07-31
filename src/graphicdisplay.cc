@@ -233,16 +233,13 @@ void GraphicDisplay::print(ostream &out) {
 void GraphicDisplay::setPerspective(Player* newPerspective) {
     perspective = newPerspective;
     
-    // Only update tiles with occupants (colors and visibility change)
+    // Force redraw of all tiles with occupants since colors change with perspective
     for (int r = 0; r < gridSize; ++r) {
         for (int c = 0; c < gridSize; ++c) {
             Tile* tile = board->getTileAt(r, c);
             if (tile && tile->getOccupant()) {
-                string newDisplay = getTileDisplayString(r, c);
-                if (previousBoard[r][c] != newDisplay) {
-                    drawSingleTile(r, c);
-                    previousBoard[r][c] = newDisplay;
-                }
+                drawSingleTile(r, c);
+                previousBoard[r][c] = getTileDisplayString(r, c);
             }
         }
     }
@@ -386,20 +383,43 @@ std::pair<std::string, int> GraphicDisplay::getLinkDisplayInfo(Link* link, Playe
             return {cellText, colour};
         }
     } else {
-        // Opponent's link - check if revealed
+        // Opponent's link - always show the letter, but color depends on if revealed
         auto known = perspective->getKnownOpponentLinks().find(owner);
-        if (known != perspective->getKnownOpponentLinks().end()) {
-            for (const auto& pair : known->second) {
-                if (pair.second == link) {
+        bool isRevealed = false;
+        
+        // First, find the letter for this link
+        for (const auto& pair : owner->getLinks()) {
+            if (pair.second.get() == link) {
+                cellText = pair.first;
+                break;
+            }
+        }
+        
+        // If not found in active links, check downloaded links
+        if (cellText.empty()) {
+            for (const auto& pair : owner->getDownloadedLinks()) {
+                if (pair.second.get() == link) {
                     cellText = pair.first;
-                    colour = (link->getLinkType() == LinkType::DATA) ? Xwindow::Green : Xwindow::Red;
-                    return {cellText, colour};
+                    break;
                 }
             }
         }
-        // Not revealed
-        cellText = "?";
-        colour = Xwindow::Black;
+        
+        // Check if this link is revealed to determine color
+        if (known != perspective->getKnownOpponentLinks().end()) {
+            for (const auto& pair : known->second) {
+                if (pair.second == link) {
+                    isRevealed = true;
+                    colour = (link->getLinkType() == LinkType::DATA) ? Xwindow::Green : Xwindow::Red;
+                    break;
+                }
+            }
+        }
+        
+        if (!isRevealed) {
+            colour = Xwindow::Black; // Unknown links are black with white text
+        }
+        
         return {cellText, colour};
     }
     
@@ -416,10 +436,16 @@ void GraphicDisplay::renderTileContent(int x, int y, const std::string& cellText
     xw.fillRectangle(x + cellSize - 1, y, 1, cellSize, Xwindow::Black);
     xw.fillRectangle(x, y + cellSize - 1, cellSize, 1, Xwindow::Black);
     
-    // Draw text centered
+    // Draw text centered with appropriate color for contrast
     int textX = x + cellSize / 2 - 4;
     int textY = y + cellSize / 2 + 4;
-    xw.drawString(textX, textY, cellText);
+    
+    // Use white text on black background for better contrast
+    if (colour == Xwindow::Black) {
+        xw.drawString(textX, textY, cellText, Xwindow::White);
+    } else {
+        xw.drawString(textX, textY, cellText, Xwindow::Black);
+    }
 }
 
 // Helper method to update player stats tracking
